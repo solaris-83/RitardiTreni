@@ -28,16 +28,4 @@ Global
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {146FFB0E-EADE-4A25-8EF8-A906BD11F6DE}
 	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://solaris83.visualstudio.com/
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Ritardi\u0020treni\\Ritardi\u0020treni.csproj
-		SccProjectName1 = Ritardi\u0020treni
-		SccLocalPath1 = Ritardi\u0020treni
-		SccProjectUniqueName2 = DataServiceLibrary\\DataServiceLibrary.csproj
-		SccProjectName2 = DataServiceLibrary
-		SccLocalPath2 = DataServiceLibrary
-	EndGlobalSection
 EndGlobal
