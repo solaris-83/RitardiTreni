@@ -1,2 +1,2 @@
 # RitardiTreni
-WPF application to monitor daily trains
+WPF application to monitor my daily trains
