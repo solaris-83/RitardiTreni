@@ -175,10 +175,10 @@ namespace Ritardi_treni.ViewModel
                 switch (_trattaSelezionata)
                 {
                     case "BIELLA - NOVARA":
-                        risultati = await _dataService.GetInfoByTrain(new string[] { "S00070" }, new string[] { "S00248" }, true, @"^48\d{2}$"); //BI_NO
+                        risultati = await _dataService.GetInfoByTrain(new string[] { "S00070" }, new string[] { "S00248" }, true, @"^11[6|7]\d{2}$"); //BI_NO
                         break;
                     case "BIELLA - SANTHIA'":
-                        risultati = await _dataService.GetInfoByTrain(new string[] { "S00070" }, new string[] { "S00240" }, true, @"^45\d{2}$");   //BI_SAN
+                        risultati = await _dataService.GetInfoByTrain(new string[] { "S00070" }, new string[] { "S00240" }, true, @"^117\d{2}$");   //BI_SAN
                         break;
                     case "TORINO - MILANO":
                         risultati = await _dataService.GetInfoByTrain(new string[] { "S00219", "S00452", "S00452" }, new string[] { "S01700", "S01645", "S00248" }, true, @"^2\d{3}$");  //TO_MI CENTR
