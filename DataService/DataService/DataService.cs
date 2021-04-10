@@ -136,9 +136,10 @@ namespace DataServiceLibrary
                 var info_1 = responseToParse.Split('\n')[0].Split('|');
                 var info_2 = info_1[1].Split('-');
 
-                var request = new RestRequest(@"http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/{codiceStazione}/{numeroTreno}", Method.GET);
+                var request = new RestRequest(@"http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/{codiceStazione}/{numeroTreno}/{time}", Method.GET);
                 request.AddUrlSegment("codiceStazione", info_2[1]);
                 request.AddUrlSegment("numeroTreno", info_2[0]);
+                request.AddUrlSegment("time", info_2[2]);
 
                 var client = new RestClient(request.Resource);
                 var response = await client.ExecuteTaskAsync<List<OrarioTreni>>(request);
@@ -206,5 +207,6 @@ namespace DataServiceLibrary
             dtDateTime = dtDateTime.AddMilliseconds(unixTimeStamp).ToLocalTime();
             return dtDateTime;
         }
+
     }
 }
