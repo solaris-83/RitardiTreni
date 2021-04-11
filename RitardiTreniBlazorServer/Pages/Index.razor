@@ -1,0 +1,96 @@
+﻿@page "/"
+@inject IDataService dataService
+
+<h1>Giornata del @DateTime.Today.Date.ToString("dd/MM/yyyy")</h1>
+
+<p>
+    <select class="form-control selectpicker col-3" @onchange="async(e) => { await OnChangeHandler(e); }">
+        <option disabled>Scegli la tratta</option>
+        @foreach (var item in journeys)
+        {
+            <option value="@item">@item</option>
+        }
+    </select>
+</p>
+
+@if (dataItems == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Numero treno</th>
+                <th>Nome stazione</th>
+                <th>Ritardo (min.)</th>
+                <th>> 10?</th>
+                <th>Partenza programmata</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in dataItems)
+            {
+            <tr>
+                @if (item.IsBold)
+                {
+                    <td><b>@item.NumeroTreno</b></td>
+                }
+                else
+                {
+                   <td>@item.NumeroTreno</td>
+                }
+                <td>@item.NomeStazione</td>
+                <td>@item.MinutiRitardo</td>
+                <td>
+                    <input type="checkbox" checked="@item.IsRitardoSignificativo" onclick="return false" />
+                </td>
+                <td>@item.OrarioProgrammatoPartenza</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<DataItem> dataItems;
+
+    public string selectedJourney { get; set; }
+
+    private string[] journeys { get; } = new string[] { "BIELLA - NOVARA", "BIELLA - SANTHIA'", "TORINO - MILANO" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task OnChangeHandler(ChangeEventArgs e)
+    {
+        selectedJourney = e.Value.ToString();
+        await Load();
+    }
+
+    private async Task Load()
+    {
+        dataItems = null;
+        var risultati = new DataItemExtended();
+         
+        switch (selectedJourney)
+        {
+            case "BIELLA - NOVARA":
+                risultati = await dataService.GetInfoByTrain(new string[] { "S00070" }, new string[] { "S00248" }, true, @"^11[6|7]\d{2}$"); //BI_NO
+                break;
+            case "BIELLA - SANTHIA'":
+                risultati = await dataService.GetInfoByTrain(new string[] { "S00070" }, new string[] { "S00240" }, true, @"^117\d{2}$");   //BI_SAN
+                break;
+            case "TORINO - MILANO":
+                risultati = await dataService.GetInfoByTrain(new string[] { "S00219", "S00452", "S00452" }, new string[] { "S01700", "S01645", "S00248" }, true, @"^2\d{3}$");  //TO_MI CENTR
+                break;
+
+        }
+        dataItems = risultati.DataList;
+    }
+}
+
