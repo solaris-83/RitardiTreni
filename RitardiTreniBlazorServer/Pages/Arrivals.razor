@@ -23,8 +23,13 @@
                     Nome stazione
                 </label>
                 <div class="col-sm-3">
-                    <InputText id="nomeStazione" class="form-control" placeholder=""
-                               @bind-Value="searchTrainModel.NomeStazione" />
+                    <select class="form-control selectpicker" @bind="searchTrainModel.NomeStazione">
+                        <option disabled>Scegli la stazione</option>
+                        @foreach (var item in nomiStazioni)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    </select>
                     <ValidationMessage For="@(() => searchTrainModel.NomeStazione)" />
                 </div>
             </div>
@@ -58,9 +63,18 @@
 
         private TrainModel searchTrainModel;
 
+        private String[] nomiStazioni;
+
         protected async override Task OnInitializedAsync()
         {
             searchTrainModel = new TrainModel();
+            nomiStazioni = new string[]
+            {
+
+                "BIELLA S.PAOLO","CARPIGNANO SESIA", "CHIVASSO", "COSSATO", "MAGENTA", "MILANO CENTRALE", "MILANO PORTA GARIBALDI", "NOVARA",
+                    "RHO FIERA MILANO", "ROVASENDA", "SALUSSOLA", "SANTHIA`", "TORINO P.NUOVA", "TORINO PORTA SUSA", "VERCELLI"
+                };
+
             await base.OnInitializedAsync();
         }
 
