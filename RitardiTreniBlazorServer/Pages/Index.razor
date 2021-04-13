@@ -1,7 +1,7 @@
 ﻿@page "/"
 @inject IDataService dataService
 
-<h1>Giornata del @DateTime.Today.Date.ToString("dd/MM/yyyy")</h1>
+<h3>Giornata del @DateTime.Today.Date.ToString("dd/MM/yyyy")</h3>
 
 <p>
     <select class="form-control selectpicker col-3" @onchange="async(e) => { await OnChangeHandler(e); }">

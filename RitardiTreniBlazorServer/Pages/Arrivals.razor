@@ -1,0 +1,92 @@
+﻿@page "/arrivals"
+@inject IDataService dataService
+
+    <EditForm Model="@searchTrainModel" OnValidSubmit="async() => await HandleValidSubmit()">
+        <DataAnnotationsValidator />
+        <h3>Cerca treno</h3>
+        <hr />
+        <ValidationSummary />
+        <div>
+            <div class="form-group row">
+                <label for="numTreno" class="col-sm-2 col-form-label">
+                    Numero treno
+                </label>
+                <div class="col-sm-3">
+                    <InputText id="numTreno" class="form-control" placeholder=""
+                               @bind-Value="searchTrainModel.NumeroTreno" />
+                    <ValidationMessage For="@(() => searchTrainModel.NumeroTreno)" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="nomeStazione" class="col-sm-2 col-form-label">
+                    Nome stazione
+                </label>
+                <div class="col-sm-3">
+                    <InputText id="nomeStazione" class="form-control" placeholder=""
+                               @bind-Value="searchTrainModel.NomeStazione" />
+                    <ValidationMessage For="@(() => searchTrainModel.NomeStazione)" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="dataViaggio" class="col-sm-2 col-form-label">
+                    Seleziona data
+                </label>
+                <div class="col-sm-3">
+                    <InputDate id="dataViaggio" class="form-control" placeholder=""
+                               @bind-Value="searchTrainModel.DataViaggio" />
+                    <ValidationMessage For="@(() => searchTrainModel.DataViaggio)" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-3">
+                    <button class="btn btn-primary" disabled="@isDisable" type="submit">Visualizza</button>
+                </div>
+            </div>
+
+            <hr />
+            <div class="form-group row">
+                <span>@outputString</span>
+            </div>
+        </div>
+    </EditForm>
+    @code {
+
+        private bool isDisable = false;
+
+        private TrainModel searchTrainModel;
+
+        protected async override Task OnInitializedAsync()
+        {
+            searchTrainModel = new TrainModel();
+            await base.OnInitializedAsync();
+        }
+
+        private async Task HandleValidSubmit()
+        {
+
+            if (searchTrainModel != null)
+            {
+                outputString = string.Empty;
+                isDisable = true;
+                outputString = await dataService.MostraArrivo(searchTrainModel.NumeroTreno, searchTrainModel.NomeStazione, searchTrainModel.DataViaggio);
+                isDisable = false;
+            }
+        }
+
+        private string outputString;
+
+        public class TrainModel
+        {
+            [Required(ErrorMessage = "Inserisci data")]
+            public DateTime DataViaggio { get; set; } = DateTime.Now;
+
+            [Required(ErrorMessage = "Inserisci nome stazione")]
+            public string NomeStazione { get; set; }
+
+            [Required(ErrorMessage = "Inserisci numero treno")]
+            public string NumeroTreno { get; set; }
+        }
+    }

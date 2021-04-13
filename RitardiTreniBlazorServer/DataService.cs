@@ -31,7 +31,7 @@ namespace DataServiceLibrary
             request.AddUrlSegment("dataOra", DateTime.Now.ToString("yyyy-MM-ddT00:00:00"));
 
             var client = new RestClient(request.Resource);
-            var response = await client.ExecuteTaskAsync<ElencoNumeriTreni>(request);
+            var response = await client.ExecuteAsync<ElencoNumeriTreni>(request);
 
             var responseParsed = response.Data;
             responseParsed?.soluzioni?.ForEach(sol => sol.vehicles.ForEach(veh =>
@@ -67,7 +67,7 @@ namespace DataServiceLibrary
             requestTreno.AddHeader("Accept", "text/plain");
             requestTreno.AddUrlSegment("stazione", nomeStazione);
             var clientTreno = new RestClient("http://www.viaggiatreno.it/viaggiatrenonew");
-            var responseTreno = await clientTreno.ExecuteTaskAsync(requestTreno);
+            var responseTreno = await clientTreno.ExecuteAsync(requestTreno);
 
             CookieContainer cookiecon = new CookieContainer();
 
@@ -85,7 +85,7 @@ namespace DataServiceLibrary
             request.AddQueryParameter("locArrivoDesc", nomeStazione);
             request.AddQueryParameter("date", dataSelezionata.ToString("dd-MM-yyyy"));
             */
-            var response = await clientTreno.ExecuteTaskAsync<List<ComunicazioneArrivo>>(request);
+            var response = await clientTreno.ExecuteAsync<List<ComunicazioneArrivo>>(request);
 
             if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
             {
@@ -103,7 +103,7 @@ namespace DataServiceLibrary
                     request.AddQueryParameter("locArrivo", info_2[0]);
                     request.AddQueryParameter("locArrivoDesc", nomeStazione);
                     request.AddQueryParameter("date", dataSelezionata.ToString("dd-MM-yyyy"));
-                    response = await clientTreno.ExecuteTaskAsync<List<ComunicazioneArrivo>>(request);
+                    response = await clientTreno.ExecuteAsync<List<ComunicazioneArrivo>>(request);
                     responseParsed = response.Data?.FirstOrDefault();
                     comunicazione = responseParsed?.comunicazione;
                 }
@@ -129,7 +129,7 @@ namespace DataServiceLibrary
                 requestTreno.AddHeader("Accept", "text/plain");
                 requestTreno.AddUrlSegment("numeroTreno", numero);
                 var clientTreno = new RestClient(requestTreno.Resource);
-                var responseTreno = await clientTreno.ExecuteTaskAsync(requestTreno);
+                var responseTreno = await clientTreno.ExecuteAsync(requestTreno);
                 var responseToParse = responseTreno.Content.ToString().TrimEnd('\r', '\n');
                 if (string.IsNullOrEmpty(responseToParse))
                     continue;
@@ -142,7 +142,7 @@ namespace DataServiceLibrary
                 request.AddUrlSegment("time", info_2[2]);
 
                 var client = new RestClient(request.Resource);
-                var response = await client.ExecuteTaskAsync<List<OrarioTreni>>(request);
+                var response = await client.ExecuteAsync<List<OrarioTreni>>(request);
                 if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var responseParsed = response.Data;
