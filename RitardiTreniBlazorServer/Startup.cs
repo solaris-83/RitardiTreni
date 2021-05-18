@@ -4,11 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using RitardiTreniBlazorServer.Data;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using DataServiceLibrary;
 
 namespace RitardiTreniBlazorServer
@@ -28,8 +24,8 @@ namespace RitardiTreniBlazorServer
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
             services.AddTransient<IDataService, DataService>();
+            services.AddSingleton<PersistenceState>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

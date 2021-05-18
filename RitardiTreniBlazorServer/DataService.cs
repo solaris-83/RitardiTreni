@@ -61,9 +61,10 @@ namespace DataServiceLibrary
         public async Task<string> MostraArrivo(string numeroTreno, string nomeStazione, DateTime dataSelezionata)
         {
             string comunicazione = "";
-            var requestTreno = new RestRequest(@"resteasy/viaggiatreno/autocompletaStazione/{stazione}", Method.GET);
-
-            requestTreno.RequestFormat = DataFormat.None;
+            var requestTreno = new RestRequest(@"resteasy/viaggiatreno/autocompletaStazione/{stazione}", Method.GET)
+            {
+                RequestFormat = DataFormat.None
+            };
             requestTreno.AddHeader("Accept", "text/plain");
             requestTreno.AddUrlSegment("stazione", nomeStazione);
             var clientTreno = new RestClient("http://www.viaggiatreno.it/viaggiatrenonew");
@@ -124,8 +125,10 @@ namespace DataServiceLibrary
             dataList = new DataItemExtended();
             foreach (var numero in _elencoTreni)
             {
-                var requestTreno = new RestRequest(@"http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{numeroTreno}", Method.GET);
-                requestTreno.RequestFormat = DataFormat.None;
+                var requestTreno = new RestRequest(@"http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{numeroTreno}", Method.GET)
+                {
+                    RequestFormat = DataFormat.None
+                };
                 requestTreno.AddHeader("Accept", "text/plain");
                 requestTreno.AddUrlSegment("numeroTreno", numero);
                 var clientTreno = new RestClient(requestTreno.Resource);

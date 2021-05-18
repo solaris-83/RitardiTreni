@@ -4,7 +4,7 @@
 <h3>Giornata del @DateTime.Today.Date.ToString("dd/MM/yyyy")</h3>
 
 <p>
-    <select class="form-control selectpicker col-3" @onchange="async(e) => { await OnChangeHandler(e); }">
+    <select class="form-control col-3" @onchange="async(e) => { await OnChangeHandler(e); }">
         <option disabled>Scegli la tratta</option>
         @foreach (var item in journeys)
         {
@@ -32,31 +32,33 @@ else
         <tbody>
             @foreach (var item in dataItems)
             {
-            <tr>
-                @if (item.IsBold)
-                {
-                    <td><b>@item.NumeroTreno</b></td>
-                }
-                else
-                {
-                   <td>@item.NumeroTreno</td>
-                }
-                <td>@item.NomeStazione</td>
-                <td>@item.MinutiRitardo</td>
-                <td>
-                    <input type="checkbox" checked="@item.IsRitardoSignificativo" onclick="return false" />
-                </td>
-                <td>@item.OrarioProgrammatoPartenza</td>
-            </tr>
+                <tr>
+                    @if (item.IsBold)
+                    {
+                        <td><b>@item.NumeroTreno</b></td>
+                    }
+                    else
+                    {
+                        <td>@item.NumeroTreno</td>
+                    }
+                    <td>@item.NomeStazione</td>
+                    <td>@item.MinutiRitardo</td>
+                    <td>
+                        <input type="checkbox" checked="@item.IsRitardoSignificativo" onclick="return false" />
+                    </td>
+                    <td>@item.OrarioProgrammatoPartenza</td>
+                </tr>
             }
         </tbody>
     </table>
 }
 
 @code {
+
     private IEnumerable<DataItem> dataItems;
 
     public string selectedJourney { get; set; }
+
 
     private string[] journeys { get; } = new string[] { "BIELLA - NOVARA", "BIELLA - SANTHIA'", "TORINO - MILANO" };
 
@@ -65,6 +67,7 @@ else
         await Load();
         await base.OnInitializedAsync();
     }
+
 
     private async Task OnChangeHandler(ChangeEventArgs e)
     {
@@ -76,7 +79,7 @@ else
     {
         dataItems = null;
         var risultati = new DataItemExtended();
-         
+
         switch (selectedJourney)
         {
             case "BIELLA - NOVARA":
