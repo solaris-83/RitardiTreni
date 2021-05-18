@@ -1,0 +1,39 @@
+
+<h1>Giornata del {{currentDate | date : 'dd/MM/yyyy'}}</h1>
+
+  <!--<mat-spinner class="spinner" [color]="color" value=100 mode="indeterminate" *ngIf="isLoading"></mat-spinner>-->
+
+
+  <div class="combo form-row-select">
+    <select class="select" (change)="OnChangeSelected($event.target.value)">
+      <option disabled selected value="">Scegli una tratta</option>
+      <option class="option" *ngFor="let item of comboTratte " [ngValue]="item">
+        {{item}}
+      </option>
+    </select>
+  </div>
+
+  <div *ngIf="dataList.length > 0 && !isLoading">
+  <table class="table overflow-hidden">
+    <thead>
+      <tr>
+        <th scope="col">Numero treno</th>
+        <th scope="col">Nome stazione</th>
+        <th scope="col">Ritardo (min.)</th>
+        <th scope="col">orario programmato</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of dataList">
+        <td [ngStyle]="row.isBold && {'font-weight': 'bold'}">{{row.trainNumber}}</td>
+        <td [ngStyle]="row.isBold && {'font-weight': 'bold'}">{{row.stationName}}</td>
+        <td [ngStyle]="row.minuteDelay > 10 && {'font-weight': 'bold', 'color': 'red'}">{{row.minuteDelay}}</td>
+        <td>{{row.scheduledTime}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+
+

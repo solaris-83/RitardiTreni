@@ -1,0 +1,34 @@
+.overlay{
+  position: fixed;
+  display: block;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(74,74,74,.8);
+  z-index: 99999;
+}
+
+.overflow-hidden{
+    overflow: hidden;
+
+}
+
+.combo {
+
+  margin:10px;
+    width: 100%;
+    height: calc(1.5em + .75rem + 2px);
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    border-radius: .25rem;
+}
+.spinner{
+  margin: auto;
+  position:absolute;
+  align-content: center;
+}
