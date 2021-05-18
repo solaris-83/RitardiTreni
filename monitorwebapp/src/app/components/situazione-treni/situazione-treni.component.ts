@@ -74,6 +74,8 @@ export class SituazioneTreniComponent implements OnInit {
                               this.dataList.push(new DataItem(trainNumber, '', 0, statoTreno? statoTreno : '', true))
                             }
                             this.dataList.sort((a, b) => {
+                              return a.scheduledTime < b.scheduledTime? 1 : -1
+                            }).sort((a, b) => {
                               return a.trainNumber > b.trainNumber? 1 : -1
                             })
                          })
