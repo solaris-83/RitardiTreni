@@ -24,7 +24,7 @@ namespace DataServiceLibrary
 
         private async Task GetStazioni(string codiceStazionePartenza, string codiceStazioneArrivo, bool isRecursive, string pattern)
         {
-            var request = new RestRequest(@"http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/soluzioniViaggioNew/{codiceStazionePartenza}/{codiceStazioneArrivo}/{dataOra}", Method.GET);
+            var request = new RestRequest(@"http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/soluzioniViaggioNew/{codiceStazionePartenza}/{codiceStazioneArrivo}/{dataOra}", Method.GET);
 
             request.AddUrlSegment("codiceStazionePartenza", codiceStazionePartenza.TrimStart(new char[] { 'S', '0' }));
             request.AddUrlSegment("codiceStazioneArrivo", codiceStazioneArrivo.TrimStart(new char[] { 'S', '0' }));
@@ -66,7 +66,7 @@ namespace DataServiceLibrary
             requestTreno.RequestFormat = DataFormat.None;
             requestTreno.AddHeader("Accept", "text/plain");
             requestTreno.AddUrlSegment("stazione", nomeStazione);
-            var clientTreno = new RestClient("http://www.viaggiatreno.it/viaggiatrenonew");
+            var clientTreno = new RestClient("http://www.viaggiatreno.it/infomobilita");
             var responseTreno = await clientTreno.ExecuteAsync(requestTreno);
 
             CookieContainer cookiecon = new CookieContainer();
@@ -124,7 +124,7 @@ namespace DataServiceLibrary
             dataList = new DataItemExtended();
             foreach (var numero in _elencoTreni)
             {
-                var requestTreno = new RestRequest(@"http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{numeroTreno}", Method.GET);
+                var requestTreno = new RestRequest(@"http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{numeroTreno}", Method.GET);
                 requestTreno.RequestFormat = DataFormat.None;
                 requestTreno.AddHeader("Accept", "text/plain");
                 requestTreno.AddUrlSegment("numeroTreno", numero);
@@ -136,7 +136,7 @@ namespace DataServiceLibrary
                 var info_1 = responseToParse.Split('\n')[0].Split('|');
                 var info_2 = info_1[1].Split('-');
 
-                var request = new RestRequest(@"http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/{codiceStazione}/{numeroTreno}/{time}", Method.GET);
+                var request = new RestRequest(@"http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/andamentoTreno/{codiceStazione}/{numeroTreno}/{time}", Method.GET);
                 request.AddUrlSegment("codiceStazione", info_2[1]);
                 request.AddUrlSegment("numeroTreno", info_2[0]);
                 request.AddUrlSegment("time", info_2[2]);

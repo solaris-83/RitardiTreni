@@ -151,23 +151,23 @@ namespace Ritardi_treni.ViewModel
 
         private async Task VisualizzaCommand()
         {
-            DispatcherHelper.CheckBeginInvokeOnUI(() => { IsBusy = true; });
+            IsBusy = true;
             OutputString = string.Empty;
             try
             {
                 OutputString = await _dataService.MostraArrivo(NumeroTreno, NomeStazione, SelectedDate);
-                DispatcherHelper.CheckBeginInvokeOnUI(() => { IsBusy = false; });
+                IsBusy = false;
             }
             catch(Exception ex)
             {
-                DispatcherHelper.CheckBeginInvokeOnUI(() => { IsBusy = false; });
+                IsBusy = false;
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private async Task ExecuteCommand()
         {
-            DispatcherHelper.CheckBeginInvokeOnUI(() => { IsBusy = true; });
+            IsBusy = true;
             DataItems?.Clear();
             var risultati = new DataItemExtended();
             try
@@ -187,22 +187,13 @@ namespace Ritardi_treni.ViewModel
                 }
                 DataItems = new ObservableCollection<DataItem>(risultati.DataList);
                 _customerView = CollectionViewSource.GetDefaultView(DataItems);
-                
-
-
-                DispatcherHelper.CheckBeginInvokeOnUI(() => { IsBusy = false; });
+                IsBusy = false;
             }
             catch(Exception ex)
             {
-                DispatcherHelper.CheckBeginInvokeOnUI(() => { IsBusy = false; });
+                IsBusy = false;
                 MessageBox.Show(ex.Message);
             }
         }
-        ////public override void Cleanup()
-        ////{
-        ////    // Clean up if needed
-
-        ////    base.Cleanup();
-        ////}
     }
 }
