@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace DataServiceLibrary.Responses
@@ -57,7 +58,7 @@ namespace DataServiceLibrary.Responses
         public object anormalita { get; set; }
         public object provvedimenti { get; set; }
         public object segnalazioni { get; set; }
-        public long oraUltimoRilevamento { get; set; }
+        public long? oraUltimoRilevamento { get; set; }
         public string stazioneUltimoRilevamento { get; set; }
         public string idDestinazione { get; set; }
         public string idOrigine { get; set; }
@@ -82,7 +83,9 @@ namespace DataServiceLibrary.Responses
         public int regione { get; set; }
         public string origineZero { get; set; }
         public string destinazioneZero { get; set; }
+        [JsonIgnore]
         public long orarioPartenzaZero { get; set; }
+        [JsonIgnore]
         public long orarioArrivoZero { get; set; }
         public bool circolante { get; set; }
         public object binarioEffettivoArrivoCodice { get; set; }
