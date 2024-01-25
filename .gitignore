@@ -4,3 +4,5 @@ packages/*
 .vs/*
 .vscode/*
 */__pycache__/*
+SetupProject/Sources/*
+SetupProject/Output/*

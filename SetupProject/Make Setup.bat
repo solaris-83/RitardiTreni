@@ -1,7 +1,7 @@
 @echo off
 set "NSIS_PATH=%ProgramFiles(x86)%\NSIS\makensis.exe"
 rem set "MSBUILD_PATH=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\MSBuild\15.0\Bin\msbuild.exe"
-set "MSBUILD_PATH=%ProgramFiles(x86)%\MSBuild\14.0\Bin\msbuild.exe"
+set "MSBUILD_PATH=%ProgramFiles%\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\msbuild.exe"
 rem set "SIGNTOOL_PATH=%ProgramFiles(x86)%\Microsoft SDKs\ClickOnce\SignTool\SignTool.exe"
 set "SIGNTOOL_PATH=%ProgramFiles(x86)%\Windows Kits\8.1\bin\x64\SignTool.exe"
 
@@ -9,6 +9,7 @@ REM ###########################################################
 REM #####                                     Delete old files                                       ####
 REM ###########################################################
 del .\Sources\*.* /Q
+del .\Output\*.* /Q
 
 REM ###########################################################
 REM #####                             Build visual studio project                             ####
@@ -36,6 +37,6 @@ REM ###########################################################
 REM #####         Wait for setup.exe to not be locked, then sign the file     ####
 REM ###########################################################
 
-
+mkdir ".\Output"
 %SystemRoot%\explorer.exe ".\Output"
 pause

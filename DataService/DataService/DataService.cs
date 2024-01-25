@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DataServiceLibrary.Model;
@@ -13,64 +11,56 @@ namespace DataServiceLibrary
 {
     public class DataService : IDataService
     {
-        List<string> _elencoTreni;
+        List<(string, string)> _elencoTreni;
         DataItemExtended dataList;
-
+        private const string BASE_PATH_1 = BASE_PATH + "/resteasy/viaggiatreno";
+        private const string BASE_PATH = "http://www.viaggiatreno.it/infomobilita";
         public DataService()
         {
-            _elencoTreni = new List<string>();
+            _elencoTreni = new List<(string, string)>();
             dataList = new DataItemExtended();
         }
 
         private async Task GetStazioni(string codiceStazionePartenza, string codiceStazioneArrivo, bool isRecursive, string pattern)
         {
-            var request = new RestRequest(@"http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/soluzioniViaggioNew/{codiceStazionePartenza}/{codiceStazioneArrivo}/{dataOra}", Method.GET);
+            var client = new RestClient(BASE_PATH_1);
+            var request = new RestRequest(@"soluzioniViaggioNew/{codiceStazionePartenza}/{codiceStazioneArrivo}/{dataOra}");
 
             request.AddUrlSegment("codiceStazionePartenza", codiceStazionePartenza.TrimStart(new char[] { 'S', '0' }));
             request.AddUrlSegment("codiceStazioneArrivo", codiceStazioneArrivo.TrimStart(new char[] { 'S', '0' }));
             request.AddUrlSegment("dataOra", DateTime.Now.ToString("yyyy-MM-ddT00:00:00"));
-
-            var client = new RestClient(request.Resource);
-            var response = await client.ExecuteAsync<ElencoNumeriTreni>(request);
-
-            var responseParsed = response.Data;
-            responseParsed?.soluzioni?.ForEach(sol => sol.vehicles.ForEach(veh =>
+            var response = await client.GetAsync<ElencoNumeriTreni>(request);
+            response?.soluzioni?.ForEach(sol => sol.vehicles.ForEach(veh =>
             {
                 if ((veh.categoria == "235" && veh.categoriaDescrizione == "RV") || (veh.categoria == "197" && veh.categoriaDescrizione == "Regionale"))
                 {
-                    if (!_elencoTreni.Contains(veh.numeroTreno) && Regex.IsMatch(veh.numeroTreno, pattern))
-                        _elencoTreni.Add(veh.numeroTreno);
+                    if (!_elencoTreni.Contains((veh.numeroTreno, codiceStazionePartenza)) && Regex.IsMatch(veh.numeroTreno, pattern))
+                        _elencoTreni.Add((veh.numeroTreno, codiceStazionePartenza));
                 }
-
             }));
 
             if (!isRecursive)
             {
-                _elencoTreni.Sort();
+                _elencoTreni.OrderBy(s => s.Item1);
                 return;
             }
-
-
             await GetStazioni(codiceStazioneArrivo, codiceStazionePartenza, false, pattern);
-
-            _elencoTreni.Sort();
+            _elencoTreni.OrderBy(s => s.Item1);
         }
-
 
 
         public async Task<string> MostraArrivo(string numeroTreno, string nomeStazione, DateTime dataSelezionata)
         {
             string comunicazione = "";
-            var requestTreno = new RestRequest(@"resteasy/viaggiatreno/autocompletaStazione/{stazione}", Method.GET);
-
-            requestTreno.RequestFormat = DataFormat.None;
+            var clientTreno = new RestClient(BASE_PATH_1);
+            var requestTreno = new RestRequest(@"autocompletaStazione/{stazione}")
+            {
+                RequestFormat = DataFormat.None
+            };
             requestTreno.AddHeader("Accept", "text/plain");
-            requestTreno.AddUrlSegment("stazione", nomeStazione);
-            var clientTreno = new RestClient("http://www.viaggiatreno.it/infomobilita");
-            var responseTreno = await clientTreno.ExecuteAsync(requestTreno);
-
-            CookieContainer cookiecon = new CookieContainer();
-
+            requestTreno.AddUrlSegment("stazione", nomeStazione.Length > 20 ? nomeStazione.Substring(0, 20) : nomeStazione);
+            
+            var responseTreno = await clientTreno.GetAsync(requestTreno);
             var responseToParse = responseTreno.Content.ToString().TrimEnd('\r', '\n');
             if (string.IsNullOrEmpty(responseToParse))
                 return comunicazione;
@@ -78,34 +68,29 @@ namespace DataServiceLibrary
             if (info_1[0] != nomeStazione)
                 return comunicazione;
             var info_2 = info_1[1].Split('-');
-            var request = new RestRequest("StampaTreno", Method.POST);
+             clientTreno = new RestClient(BASE_PATH);
+            var request = new RestRequest("StampaTreno");
 
-            /*request.AddQueryParameter("numTreno", numeroTreno);
+            request.AddQueryParameter("numTreno", numeroTreno);
             request.AddQueryParameter("locArrivo", info_2[0]);
             request.AddQueryParameter("locArrivoDesc", nomeStazione);
             request.AddQueryParameter("date", dataSelezionata.ToString("dd-MM-yyyy"));
-            */
-            var response = await clientTreno.ExecuteAsync<List<ComunicazioneArrivo>>(request);
-
-            if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+            
+            var response = await clientTreno.PostAsync(request);
+            if (response != null)
             {
 
-                var cookie = response.Cookies.FirstOrDefault(c => c.Name == "JSESSIONID");
+                var cookie = response.Cookies["JSESSIONID"];
                 if (cookie != null)
-                    cookiecon.Add(new Cookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain));
-
-                clientTreno.CookieContainer = cookiecon;
-                var responseParsed = response.Data?.FirstOrDefault();
-                comunicazione = responseParsed?.comunicazione;
+                    request.AddCookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain);
                 if (string.IsNullOrEmpty(comunicazione))
                 {
                     request.AddQueryParameter("numTreno", numeroTreno);
                     request.AddQueryParameter("locArrivo", info_2[0]);
                     request.AddQueryParameter("locArrivoDesc", nomeStazione);
                     request.AddQueryParameter("date", dataSelezionata.ToString("dd-MM-yyyy"));
-                    response = await clientTreno.ExecuteAsync<List<ComunicazioneArrivo>>(request);
-                    responseParsed = response.Data?.FirstOrDefault();
-                    comunicazione = responseParsed?.comunicazione;
+                    var response1 = await clientTreno.PostAsync<ComunicazioneArrivo>(request);
+                    comunicazione = response1?.comunicazione;
                 }
             }
             else
@@ -121,60 +106,39 @@ namespace DataServiceLibrary
                 await GetStazioni(codiceStazionePartenza[i], codiceStazioneArrivo[i], isRecursive, pattern);
             }
 
+            var clientTreno = new RestClient(BASE_PATH_1);
             dataList = new DataItemExtended();
-            foreach (var numero in _elencoTreni)
+            foreach (var treno in _elencoTreni)
             {
-                var requestTreno = new RestRequest(@"http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{numeroTreno}", Method.GET);
-                requestTreno.RequestFormat = DataFormat.None;
-                requestTreno.AddHeader("Accept", "text/plain");
-                requestTreno.AddUrlSegment("numeroTreno", numero);
-                var clientTreno = new RestClient(requestTreno.Resource);
-                var responseTreno = await clientTreno.ExecuteAsync(requestTreno);
-                var responseToParse = responseTreno.Content.ToString().TrimEnd('\r', '\n');
-                if (string.IsNullOrEmpty(responseToParse))
-                    continue;
-                var info_1 = responseToParse.Split('\n')[0].Split('|');
-                var info_2 = info_1[1].Split('-');
-
-                var request = new RestRequest(@"http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/andamentoTreno/{codiceStazione}/{numeroTreno}/{time}", Method.GET);
-                request.AddUrlSegment("codiceStazione", info_2[1]);
-                request.AddUrlSegment("numeroTreno", info_2[0]);
-                request.AddUrlSegment("time", info_2[2]);
-
-                var client = new RestClient(request.Resource);
-                var response = await client.ExecuteAsync<List<OrarioTreni>>(request);
-                if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+                var request = new RestRequest(@"andamentoTreno/{codiceStazione}/{numeroTreno}/{time}");
+                request.AddUrlSegment("codiceStazione", treno.Item2);
+                request.AddUrlSegment("numeroTreno", treno.Item1);
+                request.AddUrlSegment("time", DateTimeToUnixTimeStamp(DateTime.Today));
+                
+                var response = await clientTreno.GetAsync<OrarioTreni>(request);
+                if (response != null)
                 {
-                    var responseParsed = response.Data;
-                    if (responseParsed != null)
+                    if (response.fermate != null)
                     {
-
-                        foreach (var element in responseParsed)
+                        string[] input = new string[3] { response.tipoTreno, response.provvedimento.ToString(), response.subTitle };
+                        var statoTreno = GetStatoTreno(input);
+                        if (response.fermate.Count > 0)
                         {
-                            if (element.fermate != null)
+                        response.fermate.ForEach(f =>
                             {
-
-                                string[] input = new string[3] { element.tipoTreno, element.provvedimento.ToString(), element.subTitle };
-                                var statoTreno = GetStatoTreno(input);
-                                if (element.fermate.Count > 0)
-                                {
-                                    element.fermate.ForEach(f =>
-                                    {
-                                        dataList.DataList.Add(new DataItem(numero, f.stazione, f.ritardo, string.IsNullOrEmpty(statoTreno) ? UnixTimeStampToDateTime(double.Parse(f.programmata.ToString())).ToString("HH:mm") : statoTreno, f.tipoFermata == "A" || f.tipoFermata == "P"));
-                                    });
-                                }
-                                else
-                                {
-                                    dataList.DataList.Add(new DataItem(numero, "", 0, string.IsNullOrEmpty(statoTreno) ? "" : statoTreno, true));
-                                }
-
-                            }
-                            dataList.OraUltimoRilevamento = UnixTimeStampToDateTime(double.Parse(element.oraUltimoRilevamento.ToString())).ToString("HH:mm");
-                            dataList.StazioneUltimoRilevamente = element.stazioneUltimoRilevamento;
-                            dataList.Categoria = element.categoria;
-                            dataList.NumeroTreno = element.numeroTreno.ToString();
+                                dataList.DataList.Add(new DataItem(treno.Item1, f.stazione, f.ritardo, string.IsNullOrEmpty(statoTreno) ? UnixTimeStampToDateTime(double.Parse(f.programmata.ToString())).ToString("HH:mm") : statoTreno, f.tipoFermata == "A" || f.tipoFermata == "P"));
+                            });
+                        }
+                        else
+                        {
+                            dataList.DataList.Add(new DataItem(treno.Item1, "", 0, string.IsNullOrEmpty(statoTreno) ? "" : statoTreno, true));
                         }
                     }
+                            
+                    dataList.OraUltimoRilevamento = response.oraUltimoRilevamento != null ? UnixTimeStampToDateTime(double.Parse(response.oraUltimoRilevamento.ToString())).ToString("HH:mm") : "";
+                    dataList.StazioneUltimoRilevamente = response.stazioneUltimoRilevamento;
+                    dataList.Categoria = response.categoria;
+                    dataList.NumeroTreno = response.numeroTreno.ToString();
                 }
             }
             return dataList;
@@ -201,12 +165,16 @@ namespace DataServiceLibrary
             return "";
         }
 
+        private long DateTimeToUnixTimeStamp(DateTime dt)
+        {
+            return ((DateTimeOffset)dt).ToUnixTimeMilliseconds();
+        }
+
         private DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
             DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddMilliseconds(unixTimeStamp).ToLocalTime();
             return dtDateTime;
         }
-
     }
 }

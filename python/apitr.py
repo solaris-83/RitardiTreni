@@ -22,7 +22,8 @@ class apitr:
 		'andamento': 'http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/andamentoTreno/',
 		'indicazioniViaggio': 'http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/soluzioniViaggioNew/',
 		'searchStazione': 'http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/cercaStazione/',
-		'StazioniByRegione': 'http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/elencoStazioni/'
+		'StazioniByRegione': 'http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/elencoStazioni/',
+     	'autocompletaStazione': 'http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/autocompletaStazione/'
 	}
 
 	__datetimeFormat = {
@@ -41,7 +42,7 @@ class apitr:
 		else:
 			return date.strftime(format)
 	
-	async def __request1(self, uri):
+	async def __request(self, uri):
 		async with aiohttp.ClientSession() as session:
 			async with session.get(uri) as resp:
 				if (resp.status == 200):
@@ -51,33 +52,36 @@ class apitr:
 						else:
 							return await resp.text()
 					except:
-						return resp.text
+						return resp.text()
 				else:
+					print(resp.status)
 					return None
 
 	def __minimizeCodStazione(self, codStazione:str):
 		codStazione = codStazione[1:]
 		return str(int(codStazione))
 
+	def __adjustNomeStazione(self, nomeStazione:str) -> str:
+		return nomeStazione[0:20]
 
 	####### PUBLIC METHODS #######
 	async def getInfoMob(self):
 		# GET /resteasy/viaggiatreno/infomobilitaTicker/
-		return await self.__request1(self.__uris['InfoMob'])
+		return await self.__request(self.__uris['InfoMob'])
 
 	async def getPartenze(self, idStazione:str, dataora: datetime):
 		# GET /resteasy/viaggiatreno/partenze/{codiceStazione}/{orario}
-		return await self.__request1(self.__uris['partenze'] + idStazione 
+		return await self.__request(self.__uris['partenze'] + idStazione 
 								+ '/' + self.__dateTime2Str(dataora, self.__datetimeFormat['partenze']))
 
 	async def getArrivi(self, idStazione:str, dataora: datetime):
 		# GET /resteasy/viaggiatreno/arrivi/{codiceStazione}/{orario}
-		return await self.__request1(self.__uris['arrivi'] + idStazione 
+		return await self.__request(self.__uris['arrivi'] + idStazione 
 								+ '/' + self.__dateTime2Str(dataora, self.__datetimeFormat['arrivi']))
 
 	async def getAndamento(self, idStazioneOrigine:str, idTreno:str, dataoraPartenza: datetime):
 		# GET /resteasy/viaggiatreno/andamentoTreno/{codOrigine}/{numeroTreno}/{dataPartenza}
-		return await self.__request1(self.__uris['andamento'] + idStazioneOrigine + '/' + idTreno 
+		return await self.__request(self.__uris['andamento'] + idStazioneOrigine + '/' + idTreno 
 								+ '/' + self.__dateTime2Str(dataoraPartenza, self.__datetimeFormat['andamento']))
 
 	async def getIndicazioniViaggio(self, idStazioneOrigine: str, idStazioneArrivo:str, dataora: datetime):
@@ -86,15 +90,19 @@ class apitr:
 		idStazioneOrigine = self.__minimizeCodStazione(idStazioneOrigine)
 
 		p = self.__uris['indicazioniViaggio'] + idStazioneOrigine + '/' + idStazioneArrivo + '/' + self.__dateTime2Str(dataora, self.__datetimeFormat['indicazioniViaggio'])
-		return await self.__request1(p)
+		return await self.__request(p)
 
 	async def searchStazione(self, nomeStazione:str):
 		# GET /resteasy/viaggiatreno/cercaStazione/{text}
-		return await self.__request1(self.__uris['searchStazione'] + nomeStazione)
+		return await self.__request(self.__uris['searchStazione'] + self.__adjustNomeStazione(nomeStazione))
 
 	async def getStazioniByRegione(self, codRegione:str):
 		# GET /resteasy/viaggiatreno/elencoStazioni/{regione}
-		return await self.__request1(self.__uris['StazioniByRegione'] + codRegione)
+		return await self.__request(self.__uris['StazioniByRegione'] + codRegione)
+
+	async def getAutoCompletaStazione(self, nomeStazione:str):
+		# GET /resteasy/viaggiatreno/autocompletaStazione/{stazione}
+		return await self.__request(self.__uris['autocompletaStazione'] + self.__adjustNomeStazione(nomeStazione))
 
 	async def getCodStazione(self, nomeStazione:str):
 		# return codStazione from nomeStazione
@@ -109,7 +117,7 @@ class apitr:
 				return None
 		else:
 			return None
-		
+        	
 	####### TOOLS METHODS #######
 	def timestamp2datetime(self, timestamp):
 		# convert timestamp with || without millisec to datetime
