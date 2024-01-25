@@ -46,7 +46,6 @@ class apitr:
 			async with session.get(uri) as resp:
 				if (resp.status == 200):
 					try:
-						print(resp.status)
 						if (self.__decodeJson):
 							return await resp.json()
 						else:
@@ -55,21 +54,6 @@ class apitr:
 						return resp.text
 				else:
 					return None
-
-	def __request(self, uri):
-       
-		x = requests.get(uri, headers={'Accept-Charset': 'utf-8'})
-		#set to use utf-8
-		if (x.status_code == 200):
-			try:
-				if (self.__decodeJson):
-					return x.json()
-				else:
-					return x.text
-			except:
-				return x.text
-		else:
-			return None
 
 	def __minimizeCodStazione(self, codStazione:str):
 		codStazione = codStazione[1:]
