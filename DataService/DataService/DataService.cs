@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DataServiceLibrary.Model;
@@ -10,13 +11,13 @@ namespace DataServiceLibrary
 {
     public class DataService : IDataService
     {
-        List<string> _elencoTreni;
+        List<(string, string)> _elencoTreni;
         DataItemExtended dataList;
         private const string BASE_PATH_1 = BASE_PATH + "/resteasy/viaggiatreno";
         private const string BASE_PATH = "http://www.viaggiatreno.it/infomobilita";
         public DataService()
         {
-            _elencoTreni = new List<string>();
+            _elencoTreni = new List<(string, string)>();
             dataList = new DataItemExtended();
         }
 
@@ -33,19 +34,18 @@ namespace DataServiceLibrary
             {
                 if ((veh.categoria == "235" && veh.categoriaDescrizione == "RV") || (veh.categoria == "197" && veh.categoriaDescrizione == "Regionale"))
                 {
-                    if (!_elencoTreni.Contains(veh.numeroTreno) && Regex.IsMatch(veh.numeroTreno, pattern))
-                        _elencoTreni.Add(veh.numeroTreno);
+                    if (!_elencoTreni.Contains((veh.numeroTreno, codiceStazionePartenza)) && Regex.IsMatch(veh.numeroTreno, pattern))
+                        _elencoTreni.Add((veh.numeroTreno, codiceStazionePartenza));
                 }
-
             }));
 
             if (!isRecursive)
             {
-                _elencoTreni.Sort();
+                _elencoTreni.OrderBy(s => s.Item1);
                 return;
             }
             await GetStazioni(codiceStazioneArrivo, codiceStazionePartenza, false, pattern);
-            _elencoTreni.Sort();
+            _elencoTreni.OrderBy(s => s.Item1);
         }
 
 
@@ -58,7 +58,7 @@ namespace DataServiceLibrary
                 RequestFormat = DataFormat.None
             };
             requestTreno.AddHeader("Accept", "text/plain");
-            requestTreno.AddUrlSegment("stazione", nomeStazione);
+            requestTreno.AddUrlSegment("stazione", nomeStazione.Length > 20 ? nomeStazione.Substring(0, 20) : nomeStazione);
             
             var responseTreno = await clientTreno.GetAsync(requestTreno);
             var responseToParse = responseTreno.Content.ToString().TrimEnd('\r', '\n');
@@ -108,25 +108,12 @@ namespace DataServiceLibrary
 
             var clientTreno = new RestClient(BASE_PATH_1);
             dataList = new DataItemExtended();
-            foreach (var numero in _elencoTreni)
+            foreach (var treno in _elencoTreni)
             {
-                var requestTreno = new RestRequest(@"cercaNumeroTrenoTrenoAutocomplete/{numeroTreno}")
-                {
-                    RequestFormat = DataFormat.None
-                };
-                requestTreno.AddHeader("Accept", "text/plain");
-                requestTreno.AddUrlSegment("numeroTreno", numero);
-                var responseTreno = await clientTreno.GetAsync(requestTreno);
-                var responseToParse = responseTreno.Content.ToString().TrimEnd('\r', '\n');
-                if (string.IsNullOrEmpty(responseToParse))
-                    continue;
-                var info_1 = responseToParse.Split('\n')[0].Split('|');
-                var info_2 = info_1[1].Split('-');
-
                 var request = new RestRequest(@"andamentoTreno/{codiceStazione}/{numeroTreno}/{time}");
-                request.AddUrlSegment("codiceStazione", info_2[1]);
-                request.AddUrlSegment("numeroTreno", info_2[0]);
-                request.AddUrlSegment("time", info_2[2]);
+                request.AddUrlSegment("codiceStazione", treno.Item2);
+                request.AddUrlSegment("numeroTreno", treno.Item1);
+                request.AddUrlSegment("time", DateTimeToUnixTimeStamp(DateTime.Today));
                 
                 var response = await clientTreno.GetAsync<OrarioTreni>(request);
                 if (response != null)
@@ -139,12 +126,12 @@ namespace DataServiceLibrary
                         {
                         response.fermate.ForEach(f =>
                             {
-                                dataList.DataList.Add(new DataItem(numero, f.stazione, f.ritardo, string.IsNullOrEmpty(statoTreno) ? UnixTimeStampToDateTime(double.Parse(f.programmata.ToString())).ToString("HH:mm") : statoTreno, f.tipoFermata == "A" || f.tipoFermata == "P"));
+                                dataList.DataList.Add(new DataItem(treno.Item1, f.stazione, f.ritardo, string.IsNullOrEmpty(statoTreno) ? UnixTimeStampToDateTime(double.Parse(f.programmata.ToString())).ToString("HH:mm") : statoTreno, f.tipoFermata == "A" || f.tipoFermata == "P"));
                             });
                         }
                         else
                         {
-                            dataList.DataList.Add(new DataItem(numero, "", 0, string.IsNullOrEmpty(statoTreno) ? "" : statoTreno, true));
+                            dataList.DataList.Add(new DataItem(treno.Item1, "", 0, string.IsNullOrEmpty(statoTreno) ? "" : statoTreno, true));
                         }
                     }
                             
@@ -176,6 +163,11 @@ namespace DataServiceLibrary
                 return "DEVIATO";
             }
             return "";
+        }
+
+        private long DateTimeToUnixTimeStamp(DateTime dt)
+        {
+            return ((DateTimeOffset)dt).ToUnixTimeMilliseconds();
         }
 
         private DateTime UnixTimeStampToDateTime(double unixTimeStamp)
