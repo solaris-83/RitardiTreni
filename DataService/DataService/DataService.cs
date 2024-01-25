@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DataServiceLibrary.Model;
@@ -59,9 +60,6 @@ namespace DataServiceLibrary
             requestTreno.AddUrlSegment("stazione", nomeStazione);
             var clientTreno = new RestClient("http://www.viaggiatreno.it/infomobilita");
             var responseTreno = await clientTreno.GetAsync(requestTreno);
-
-            //CookieContainer cookiecon = new CookieContainer();
-
             var responseToParse = responseTreno.Content.ToString().TrimEnd('\r', '\n');
             if (string.IsNullOrEmpty(responseToParse))
                 return comunicazione;
@@ -80,22 +78,18 @@ namespace DataServiceLibrary
             if (response != null)
             {
 
-                //var cookie = response.Cookies.FirstOrDefault(c => c.Name == "JSESSIONID");
-                //if (cookie != null)
-                //    cookiecon.Add(new Cookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain));
-
-                //clientTreno.CookieContainer = cookiecon;
-               // comunicazione = response?.comunicazione;
-                //if (string.IsNullOrEmpty(comunicazione))
-                //{
-                //    request.AddQueryParameter("numTreno", numeroTreno);
-                //    request.AddQueryParameter("locArrivo", info_2[0]);
-                //    request.AddQueryParameter("locArrivoDesc", nomeStazione);
-                //    request.AddQueryParameter("date", dataSelezionata.ToString("dd-MM-yyyy"));
-                //    response = await clientTreno.GetAsync<List<ComunicazioneArrivo>>(request);
-                //    responseParsed = response.FirstOrDefault();
-                //    comunicazione = responseParsed?.comunicazione;
-                //}
+                var cookie = response.Cookies["JSESSIONID"];
+                if (cookie != null)
+                    request.AddCookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain);
+                if (string.IsNullOrEmpty(comunicazione))
+                {
+                    request.AddQueryParameter("numTreno", numeroTreno);
+                    request.AddQueryParameter("locArrivo", info_2[0]);
+                    request.AddQueryParameter("locArrivoDesc", nomeStazione);
+                    request.AddQueryParameter("date", dataSelezionata.ToString("dd-MM-yyyy"));
+                    var response1 = await clientTreno.PostAsync<ComunicazioneArrivo>(request);
+                    comunicazione = response1?.comunicazione;
+                }
             }
             else
                 comunicazione = "Riprova";
