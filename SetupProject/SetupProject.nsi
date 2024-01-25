@@ -35,10 +35,10 @@
 !define PRODUCT_DISPLAYNAME "Ritardi treni"
 !define EXECUTABLE_FILENAME "Ritardi treni.exe"
 !define NET_FRAMEWORK4_VERSION_REGKEY "Software\Microsoft\NET Framework Setup\NDP\v4\Full"
-!define NET_FRAMEWORK_MINIMUM_VERSION "4.6.1"
+!define NET_FRAMEWORK_MINIMUM_VERSION "4.8.1"
 #!define TARGET_DIR "${PRODUCT_PUBLISHER}\${PRODUCT_NAME}"
 !define TARGET_DIR "${PRODUCT_NAME}"
-!define NET_FRAMEWORK_SETUP_FILE "dotnetFx4.6.1.exe"
+!define NET_FRAMEWORK_SETUP_FILE "NDP481-Web.exe"
 
 ; MUI Settings
 !define MUI_ABORTWARNING
@@ -116,7 +116,7 @@ Function .onInit
 notFound:
 
 	MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 \
-		"${PRODUCT_NAME} needs the Microsoft .NET Framwork 4.6.1 to work properly. Do you want to install it now? Clicking 'NO' the installation process will abort." \
+		"${PRODUCT_NAME} needs the Microsoft .NET Framwork 4.8.1 to work properly. Do you want to install it now? Clicking 'NO' the installation process will abort." \
 		IDYES true IDNO false		
 false:
 	MessageBox MB_ICONINFORMATION|MB_OK ".NET framework installation not completed. Installation aborted."
@@ -232,7 +232,7 @@ Section Uninstall
 	# Get installation path from registry
 	ReadRegStr $R1 HKLM  "${PRODUCT_DIR_REGKEY}" 'InstallDir'
 	#Terminate application process
-	${nsProcess::CloseProcess} "${EXECUTABLE_FILENAME}" $R0
+	#${nsProcess::CloseProcess} "${EXECUTABLE_FILENAME}" $R0
 	
 	# Remove application
 	RMDIR /r $R1
@@ -334,8 +334,8 @@ true:
 		# Get installation path from registry
 		ReadRegStr $R1 HKLM  "${PRODUCT_DIR_REGKEY}" 'InstallDir'
 		#Terminate application process
-		${nsProcess::CloseProcess} "${EXECUTABLE_FILENAME}" $R0
-		ExecWait '$R0 /SP- /SILENT _?=$R1'
+		#${nsProcess::CloseProcess} "${EXECUTABLE_FILENAME}" $R0
+		#ExecWait '$R0 /SP- /SILENT _?=$R1'
 		# Remove application
 		RMDIR /r $R1
 
