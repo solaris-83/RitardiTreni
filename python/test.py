@@ -48,8 +48,11 @@ class TestApitr(unittest.IsolatedAsyncioTestCase):
                 
     async def test_getAutoCompletaStazione(self):
         for key in self.dict_stationAndCodes.keys():
-            a = await apitr(False).getAutoCompletaStazione(key)
-            self.assertIsNotNone(a, 'test_getAutoCompletaStazione empty result')
+            name = await apitr(False).getAutoCompletaStazione(key)
+            cleanedName = str(name).rstrip().split('\n')
+            first = cleanedName[0].split('|')
+            self.assertEqual(first[0],key, 'Station name does not match')
+            self.assertEqual(first[1], self.dict_stationAndCodes[key], 'Station code does not match')
                         
 if __name__ == "__main__":
     unittest.main()
