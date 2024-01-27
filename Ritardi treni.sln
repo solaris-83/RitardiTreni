@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataService", "DataService\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RitardiTreniBlazorServer", "RitardiTreniBlazorServer\RitardiTreniBlazorServer.csproj", "{0A0BFB2A-E6C5-450E-A431-7948862BEE9D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RitardiTreniNet7.0", "RitardiTreniNet7.0\RitardiTreniNet7.0.csproj", "{2D5ABD68-0EAD-452D-8B30-5E4E91A30139}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{0A0BFB2A-E6C5-450E-A431-7948862BEE9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A0BFB2A-E6C5-450E-A431-7948862BEE9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A0BFB2A-E6C5-450E-A431-7948862BEE9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D5ABD68-0EAD-452D-8B30-5E4E91A30139}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D5ABD68-0EAD-452D-8B30-5E4E91A30139}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D5ABD68-0EAD-452D-8B30-5E4E91A30139}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D5ABD68-0EAD-452D-8B30-5E4E91A30139}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
