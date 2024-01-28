@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using DataServiceLibrary.Model;
 using DataServiceLibrary.Services;
+using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
@@ -12,32 +13,41 @@ namespace RitardiTreniNet7._0
     public partial class MainViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
-        private readonly IEnumerable<TrainLine>? _trainLines;
+        private readonly ILogger _logger;
+        //private readonly IEnumerable<TrainLine>? _trainLines;
         private readonly IEnumerable<TrainJourneys>? _journeys;
+
         [ObservableProperty]
         private IEnumerable<string>? _trainJourneys;
+
         [ObservableProperty]
         private bool _isBusy;
+
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(GetInfoCommand))]
         private string _trattaSelezionata = "";
+
         [ObservableProperty]
         private ObservableCollection<DataItem> _dataItems;
+
         [ObservableProperty]
         private string _outputString = "";
+
         [ObservableProperty]
         private string _numeroTreno = "";
+
         [ObservableProperty]
         private string _nomeStazione = "";
+
         [ObservableProperty]
         private DateTime _selectedDate = DateTime.Now;
 
-        public MainViewModel(IDataService dataService)
+        public MainViewModel(IDataService dataService, ILogger<MainViewModel> logger)
         {
+            _logger = logger;
             _dataService = dataService;
             _dataItems = new ObservableCollection<DataItem>();
             using StreamReader stream1 = new StreamReader(@"Resources\lines.json");
-            _trainLines = JsonSerializer.Deserialize<IEnumerable<TrainLine>>(stream1.ReadToEnd());
+            //_trainLines = JsonSerializer.Deserialize<IEnumerable<TrainLine>>(stream1.ReadToEnd());
             using StreamReader stream2 = new StreamReader(@"Resources\journeys.json");
             _journeys = JsonSerializer.Deserialize<IEnumerable<TrainJourneys>>(stream2.ReadToEnd());
             _trainJourneys = _journeys?.Select(t => t.Name).Distinct();
@@ -66,6 +76,7 @@ namespace RitardiTreniNet7._0
             catch (Exception ex)
             {
                 IsBusy = false;
+                _logger.LogError(ex, "GetInfoAsync");
                 MessageBox.Show(ex.Message);
             }
         }
@@ -83,6 +94,7 @@ namespace RitardiTreniNet7._0
             catch (Exception ex)
             {
                 IsBusy = false;
+                _logger.LogError(ex, "GetInfoAsync");
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

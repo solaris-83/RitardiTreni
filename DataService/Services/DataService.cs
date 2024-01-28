@@ -52,49 +52,53 @@ namespace DataServiceLibrary.Services
         public async Task<string> MostraArrivo(string numeroTreno, string nomeStazione, DateTime dataSelezionata)
         {
             string comunicazione = "";
-            var clientTreno = new RestClient(BASE_PATH_1);
-            var requestTreno = new RestRequest(@"autocompletaStazione/{stazione}")
+            using (var clientTreno = new RestClient(BASE_PATH_1))
             {
-                RequestFormat = DataFormat.None
-            };
-            requestTreno.AddHeader("Accept", "text/plain");
-            requestTreno.AddUrlSegment("stazione", nomeStazione.Length > 20 ? nomeStazione.Substring(0, 20) : nomeStazione);
-            
-            var responseTreno = await clientTreno.GetAsync(requestTreno);
-            var responseToParse = responseTreno.Content.ToString().TrimEnd('\r', '\n');
-            if (string.IsNullOrEmpty(responseToParse))
-                return comunicazione;
-            var info_1 = responseToParse.Split('\n')[0].Split('|');
-            if (info_1[0] != nomeStazione)
-                return comunicazione;
-            var info_2 = info_1[1].Split('-');
-             clientTreno = new RestClient(BASE_PATH);
-            var request = new RestRequest("StampaTreno");
-
-            request.AddQueryParameter("numTreno", numeroTreno);
-            request.AddQueryParameter("locArrivo", info_2[0]);
-            request.AddQueryParameter("locArrivoDesc", nomeStazione);
-            request.AddQueryParameter("date", dataSelezionata.ToString("dd-MM-yyyy"));
-            
-            var response = await clientTreno.PostAsync(request);
-            if (response != null)
-            {
-
-                var cookie = response.Cookies["JSESSIONID"];
-                if (cookie != null)
-                    request.AddCookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain);
-                if (string.IsNullOrEmpty(comunicazione))
+                var requestTreno = new RestRequest(@"autocompletaStazione/{stazione}")
                 {
+                    RequestFormat = DataFormat.None
+                };
+                requestTreno.AddHeader("Accept", "text/plain");
+                requestTreno.AddUrlSegment("stazione", nomeStazione.Length > 20 ? nomeStazione.Substring(0, 20) : nomeStazione);
+
+                var responseTreno = await clientTreno.GetAsync(requestTreno);
+                var responseToParse = responseTreno.Content.ToString().TrimEnd('\r', '\n');
+                if (string.IsNullOrEmpty(responseToParse))
+                    return comunicazione;
+                var info_1 = responseToParse.Split('\n')[0].Split('|');
+                if (info_1[0] != nomeStazione)
+                    return comunicazione;
+                var info_2 = info_1[1].Split('-');
+                using (var client = new RestClient(BASE_PATH))
+                {
+                    var request = new RestRequest("StampaTreno");
+
                     request.AddQueryParameter("numTreno", numeroTreno);
                     request.AddQueryParameter("locArrivo", info_2[0]);
                     request.AddQueryParameter("locArrivoDesc", nomeStazione);
                     request.AddQueryParameter("date", dataSelezionata.ToString("dd-MM-yyyy"));
-                    var response1 = await clientTreno.PostAsync<ComunicazioneArrivo>(request);
-                    comunicazione = response1?.comunicazione;
+
+                    var response = await client.PostAsync(request);
+                    if (response != null)
+                    {
+
+                        var cookie = response.Cookies["JSESSIONID"];
+                        if (cookie != null)
+                            request.AddCookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain);
+                        if (string.IsNullOrEmpty(comunicazione))
+                        {
+                            request.AddQueryParameter("numTreno", numeroTreno);
+                            request.AddQueryParameter("locArrivo", info_2[0]);
+                            request.AddQueryParameter("locArrivoDesc", nomeStazione);
+                            request.AddQueryParameter("date", dataSelezionata.ToString("dd-MM-yyyy"));
+                            var response1 = await client.PostAsync<ComunicazioneArrivo>(request);
+                            comunicazione = response1?.comunicazione;
+                        }
+                    }
+                    else
+                        comunicazione = "Riprova";
                 }
             }
-            else
-                comunicazione = "Riprova";
             return comunicazione?.Replace("&egrave;", "è");
         }
 
@@ -106,39 +110,41 @@ namespace DataServiceLibrary.Services
                 await GetStazioni(codiceStazionePartenza[i], codiceStazioneArrivo[i], isRecursive, pattern);
             }
 
-            var clientTreno = new RestClient(BASE_PATH_1);
-            dataList = new DataItemExtended();
-            foreach (var treno in _elencoTreni)
-            {
-                var request = new RestRequest(@"andamentoTreno/{codiceStazione}/{numeroTreno}/{time}");
-                request.AddUrlSegment("codiceStazione", treno.Item2);
-                request.AddUrlSegment("numeroTreno", treno.Item1);
-                request.AddUrlSegment("time", DateTimeToUnixTimeStamp(DateTime.Today));
-                
-                var response = await clientTreno.GetAsync<OrarioTreni>(request);
-                if (response != null)
+            using (var clientTreno = new RestClient(BASE_PATH_1))
+            { 
+                dataList = new DataItemExtended();
+                foreach (var treno in _elencoTreni)
                 {
-                    if (response.fermate != null)
+                    var request = new RestRequest(@"andamentoTreno/{codiceStazione}/{numeroTreno}/{time}");
+                    request.AddUrlSegment("codiceStazione", treno.Item2);
+                    request.AddUrlSegment("numeroTreno", treno.Item1);
+                    request.AddUrlSegment("time", DateTimeToUnixTimeStamp(DateTime.Today));
+
+                    var response = await clientTreno.GetAsync<OrarioTreni>(request);
+                    if (response != null)
                     {
-                        string[] input = new string[3] { response.tipoTreno, response.provvedimento.ToString(), response.subTitle };
-                        var statoTreno = GetStatoTreno(input);
-                        if (response.fermate.Count > 0)
+                        if (response.fermate != null)
                         {
-                        response.fermate.ForEach(f =>
+                            string[] input = new string[3] { response.tipoTreno, response.provvedimento.ToString(), response.subTitle };
+                            var statoTreno = GetStatoTreno(input);
+                            if (response.fermate.Count > 0)
                             {
-                                dataList.DataList.Add(new DataItem(treno.Item1, f.stazione, f.ritardo, string.IsNullOrEmpty(statoTreno) ? UnixTimeStampToDateTime(double.Parse(f.programmata.ToString())).ToString("HH:mm") : statoTreno, f.tipoFermata == "A" || f.tipoFermata == "P"));
-                            });
+                                response.fermate.ForEach(f =>
+                                    {
+                                        dataList.DataList.Add(new DataItem(treno.Item1, f.stazione, f.ritardo, string.IsNullOrEmpty(statoTreno) ? UnixTimeStampToDateTime(double.Parse(f.programmata.ToString())).ToString("HH:mm") : statoTreno, f.tipoFermata == "A" || f.tipoFermata == "P"));
+                                    });
+                            }
+                            else
+                            {
+                                dataList.DataList.Add(new DataItem(treno.Item1, "", 0, string.IsNullOrEmpty(statoTreno) ? "" : statoTreno, true));
+                            }
                         }
-                        else
-                        {
-                            dataList.DataList.Add(new DataItem(treno.Item1, "", 0, string.IsNullOrEmpty(statoTreno) ? "" : statoTreno, true));
-                        }
+
+                        dataList.OraUltimoRilevamento = response.oraUltimoRilevamento != null ? UnixTimeStampToDateTime(double.Parse(response.oraUltimoRilevamento.ToString())).ToString("HH:mm") : "";
+                        dataList.StazioneUltimoRilevamente = response.stazioneUltimoRilevamento;
+                        dataList.Categoria = response.categoria;
+                        dataList.NumeroTreno = response.numeroTreno.ToString();
                     }
-                            
-                    dataList.OraUltimoRilevamento = response.oraUltimoRilevamento != null ? UnixTimeStampToDateTime(double.Parse(response.oraUltimoRilevamento.ToString())).ToString("HH:mm") : "";
-                    dataList.StazioneUltimoRilevamente = response.stazioneUltimoRilevamento;
-                    dataList.Categoria = response.categoria;
-                    dataList.NumeroTreno = response.numeroTreno.ToString();
                 }
             }
             return dataList;

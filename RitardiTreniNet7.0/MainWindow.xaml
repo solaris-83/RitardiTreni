@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RitardiTreniNet7._0.Helpers"
+        xmlns:busyIndicator="https://github.com/moh3ngolshani/BusyIndicator"
         mc:Ignorable="d" Height="480"
         Width="520"
         WindowStartupLocation="CenterScreen" 
@@ -12,6 +13,7 @@
         Title="Ritardi treni">
     <Window.Resources>
         <ResourceDictionary>
+            <SolidColorBrush x:Key="IndicatorForeground" Color="Green" />
             <ObjectDataProvider x:Key="StazioniTratte"
                         MethodName="GetShortListOfApplicationStations"
                         ObjectType="{x:Type local:DisplayAttributeBasedObjectDataProvider}">
@@ -23,51 +25,58 @@
     </Window.Resources>
     <TabControl>
         <TabItem Header="Estratto treni">
-            <Grid x:Name="LayoutRoot">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="3*"/>
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <DataGrid Grid.Row="0" ItemsSource="{Binding DataItems}" AutoGenerateColumns="False">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Numero treno"   Binding="{Binding NumeroTreno, Mode=OneWay}">
-                            <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsBold, Mode=OneWay}" Value="True">
-                                            <Setter Property="FontWeight" Value="Bold"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </DataGridTextColumn.CellStyle>
-                        </DataGridTextColumn>
+            <busyIndicator:BusyMask x:Name="BusyIndicator" 
+                    IsBusy="{Binding IsBusy}" 
+                    IndicatorType="Cogs" 
+                    BusyContent="Estrazione in corso..." 
+                    BusyContentMargin="0,20,0,0" 
+                    IsBusyAtStartup="False" >
+                <Grid x:Name="LayoutRoot">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="3*"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <DataGrid Grid.Row="0" ItemsSource="{Binding DataItems}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Numero treno"   Binding="{Binding NumeroTreno, Mode=OneWay}">
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsBold, Mode=OneWay}" Value="True">
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="Nome stazione" Binding="{Binding NomeStazione, Mode=OneWay}">
-                            <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsBold, Mode=OneWay}" Value="True">
-                                            <Setter Property="FontWeight" Value="Bold"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </DataGridTextColumn.CellStyle>
-                        </DataGridTextColumn>
-                        <DataGridTextColumn Header="Ritardo"  Binding="{Binding MinutiRitardo, Mode=OneWay}"/>
-                        <DataGridCheckBoxColumn Header="> 10'?" Binding="{Binding IsRitardoSignificativo, Mode=OneWay}"/>
-                        <DataGridTextColumn Header="Partenza progr."  Binding="{Binding OrarioProgrammatoPartenza , Mode=OneWay}"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-                <StackPanel Grid.Row="1" Margin="10">
-                    <Grid >
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <ComboBox Grid.Column="1" Name="listComboBox"  Background="Gainsboro" BorderThickness="1"  Grid.Row="0" ItemsSource="{Binding TrainJourneys}" SelectedItem="{Binding TrattaSelezionata, Mode=TwoWay}" Padding="3" Height="20" Width="150"/>
-                    </Grid>
-                </StackPanel>
-            </Grid>
+                            <DataGridTextColumn Header="Nome stazione" Binding="{Binding NomeStazione, Mode=OneWay}">
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsBold, Mode=OneWay}" Value="True">
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Ritardo"  Binding="{Binding MinutiRitardo, Mode=OneWay}"/>
+                            <DataGridCheckBoxColumn Header="> 10'?" Binding="{Binding IsRitardoSignificativo, Mode=OneWay}"/>
+                            <DataGridTextColumn Header="Partenza progr."  Binding="{Binding OrarioProgrammatoPartenza , Mode=OneWay}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <StackPanel Grid.Row="1" Margin="10">
+                        <Grid >
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <ComboBox Grid.Column="1" Name="listComboBox"  Background="Gainsboro" BorderThickness="1"  Grid.Row="0" ItemsSource="{Binding TrainJourneys}" SelectedItem="{Binding TrattaSelezionata, Mode=TwoWay}" Padding="3" Height="20" Width="150"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </busyIndicator:BusyMask>
         </TabItem>
         <TabItem Header="Il tuo arrivo">
             <Grid>
