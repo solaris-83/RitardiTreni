@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.DependencyInjection;
-using DataServiceLibrary;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
+using DataServiceLibrary.Services;
 
 namespace RitardiTreniNet7._0
 {
@@ -18,9 +18,8 @@ namespace RitardiTreniNet7._0
             Ioc.Default.ConfigureServices(new ServiceCollection()
                     //Services
                     .AddSingleton<IDataService, DataService>()
+                    .AddSingleton<MainViewModel>()
                     .BuildServiceProvider());
         }
-
     }
-
 }

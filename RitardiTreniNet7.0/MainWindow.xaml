@@ -3,14 +3,24 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:RitardiTreniNet7._0"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:local="clr-namespace:RitardiTreniNet7._0.Helpers"
         mc:Ignorable="d" Height="480"
         Width="520"
         WindowStartupLocation="CenterScreen" 
         WindowStyle="SingleBorderWindow"
         ResizeMode="NoResize"
         Title="Ritardi treni">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ObjectDataProvider x:Key="StazioniTratte"
+                        MethodName="GetShortListOfApplicationStations"
+                        ObjectType="{x:Type local:DisplayAttributeBasedObjectDataProvider}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:StazioniEnum" />
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
+    </Window.Resources>
     <TabControl>
         <TabItem Header="Estratto treni">
             <Grid x:Name="LayoutRoot">
@@ -54,13 +64,7 @@
                             <RowDefinition />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <ComboBox Grid.Column="1" Name="listComboBox"  Background="Gainsboro" BorderThickness="1"  Grid.Row="0" ItemsSource="{Binding Source={StaticResource TipologiaTratte}}" SelectedItem="{Binding TrattaSelezionata, Mode=TwoWay}" Height="30" Width="150">
-                            <!--<i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding Command}"/>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>-->
-                        </ComboBox>
+                        <ComboBox Grid.Column="1" Name="listComboBox"  Background="Gainsboro" BorderThickness="1"  Grid.Row="0" ItemsSource="{Binding TrainJourneys}" SelectedItem="{Binding TrattaSelezionata, Mode=TwoWay}" Padding="3" Height="20" Width="150"/>
                     </Grid>
                 </StackPanel>
             </Grid>
@@ -80,13 +84,12 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label  Grid.Column="0" Grid.Row="0" Content="Numero treno" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="0" Width="150" Margin="10" Text="{Binding NumeroTreno}" />
+                <TextBox Grid.Column="1" Grid.Row="0" Width="150" Height="20" Margin="10" Text="{Binding NumeroTreno}" />
                 <Label  Grid.Column="0" Grid.Row="1" Content="Nome stazione" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 <Label  Grid.Column="0" Grid.Row="2" Content="Seleziona data" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                <!--<TextBox  Grid.Column="1" Grid.Row="1" Width="150" Margin="10" Text="{Binding NomeStazione}"/>-->
-                <ComboBox  Grid.Column="1" Grid.Row="1" ItemsSource="{Binding Source={StaticResource StazioniTratte}}" SelectedItem="{Binding NomeStazione, Mode=TwoWay}" Height="28" Width="150" />
+                <ComboBox  Grid.Column="1" Grid.Row="1" ItemsSource="{Binding Source={StaticResource StazioniTratte}}" SelectedItem="{Binding NomeStazione, Mode=TwoWay}" Height="20" Width="150" />
                 <DatePicker  Grid.Column="1" Grid.Row="2" Width="150" Margin="10"  SelectedDate="{Binding SelectedDate}" FirstDayOfWeek="Monday" IsTodayHighlighted="True" DisplayDateStart="{Binding DateStart}" DisplayDateEnd="{Binding DateEnd}"/>
-                <Button  Grid.Column="1" Grid.Row="3" Height="30" Width="150" Content="Visualizza" Margin="10" Command="{Binding VisualizzaCmd}"/>
+                <Button  Grid.Column="1" Grid.Row="3" Height="30" Width="150" Content="Visualizza" Margin="10" Command="{Binding ShowArrivalsCommand}"/>
                 <TextBox  Grid.ColumnSpan="3" Grid.Row="4" Height="80" Width="400" TextWrapping="Wrap" Text="{Binding OutputString, Mode=OneWay}" VerticalAlignment="Top"/>
             </Grid>
         </TabItem>

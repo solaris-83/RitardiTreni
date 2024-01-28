@@ -1,13 +1,5 @@
-﻿using System.Text;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace RitardiTreniNet7._0
 {
@@ -19,6 +11,7 @@ namespace RitardiTreniNet7._0
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = Ioc.Default.GetRequiredService<MainViewModel>();
         }
     }
 }

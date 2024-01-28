@@ -9,8 +9,7 @@
   DataContext="{Binding Source={StaticResource Locator}, Path=ViewModelName}"
 */
 
-using DataServiceLibrary;
-using GalaSoft.MvvmLight;
+using DataServiceLibrary.Services;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
 

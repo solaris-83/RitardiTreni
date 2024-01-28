@@ -1,0 +1,72 @@
+[
+    {
+      "Stations": [
+        {
+          "From": {
+            "Code": "S00070",
+            "Name": "BIELLA S.PAOLO",
+            "DisplayName": "BIELLA S.PAOLO"
+          },
+          "To": {
+            "Code": "S00248",
+            "Name": "NOVARA",
+            "DisplayName": "NOVARA"
+          },
+          "Pattern": "^11[6|7]\\d{2}$"
+        },
+        {
+          "From": {
+            "Code": "S00070",
+            "Name": "BIELLA S.PAOLO",
+            "DisplayName": "BIELLA S.PAOLO"
+          },
+          "To": {
+            "Code": "S00240",
+            "Name": "SANTHIA",
+            "DisplayName": "SANTHIA"
+          },
+          "Pattern": "^117\\d{2}$"
+        },
+        {
+          "From": {
+            "Code": "S00219",
+            "Name": "TORINO P.NUOVA",
+            "DisplayName": "TORINO"
+          },
+          "To": {
+            "Code": "S01700",
+            "Name": "MILANO CENTRALE",
+            "DisplayName": "MILANO"
+          },
+          "Pattern": "^2\\d{3}$"
+        },
+        {
+          "From": {
+            "Code": "S00452",
+            "Name": "TORINO LINGOTTO",
+            "DisplayName": "TORINO"
+          },
+          "To": {
+            "Code": "S01645",
+            "Name": "MILANO PORTA GARIBALDI",
+            "DisplayName": "MILANO"
+          },
+          "Pattern": "^2\\d{3}$"
+        },
+        {
+          "From": {
+            "Code": "S00452",
+            "Name": "TORINO LINGOTTO",
+            "DisplayName": "TORINO"
+          },
+          "To": {
+            "Code": "S00248",
+            "Name": "NOVARA",
+            "DisplayName": "NOVARA"
+          },
+          "Pattern": "^2\\d{3}$"
+        }
+      ]
+    }
+]
+

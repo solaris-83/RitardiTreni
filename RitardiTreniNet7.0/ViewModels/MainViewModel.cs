@@ -1,7 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using DataServiceLibrary;
+using CommunityToolkit.Mvvm.Input;
 using DataServiceLibrary.Model;
+using DataServiceLibrary.Services;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Text.Json;
 using System.Windows;
 
 namespace RitardiTreniNet7._0
@@ -9,10 +12,14 @@ namespace RitardiTreniNet7._0
     public partial class MainViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
-
+        private readonly IEnumerable<TrainLine>? _trainLines;
+        private readonly IEnumerable<TrainJourneys>? _journeys;
+        [ObservableProperty]
+        private IEnumerable<string>? _trainJourneys;
         [ObservableProperty]
         private bool _isBusy;
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(GetInfoCommand))]
         private string _trattaSelezionata = "";
         [ObservableProperty]
         private ObservableCollection<DataItem> _dataItems;
@@ -29,30 +36,31 @@ namespace RitardiTreniNet7._0
         {
             _dataService = dataService;
             _dataItems = new ObservableCollection<DataItem>();
+            using StreamReader stream1 = new StreamReader(@"Resources\lines.json");
+            _trainLines = JsonSerializer.Deserialize<IEnumerable<TrainLine>>(stream1.ReadToEnd());
+            using StreamReader stream2 = new StreamReader(@"Resources\journeys.json");
+            _journeys = JsonSerializer.Deserialize<IEnumerable<TrainJourneys>>(stream2.ReadToEnd());
+            _trainJourneys = _journeys?.Select(t => t.Name).Distinct();
         }
 
-        private async Task ExecuteCommandAsync()
+        partial void OnTrattaSelezionataChanged(string value)
+        {
+            _ = GetInfoAsync();
+        }
+
+        [RelayCommand]
+        private async Task GetInfoAsync()
         {
             IsBusy = true;
             DataItems?.Clear();
-            var risultati = new DataItemExtended();
             try
             {
-                switch (TrattaSelezionata)
+                var p = _journeys?.FirstOrDefault(t => t.Name == TrattaSelezionata);
+                if (p != null)
                 {
-                    case "BIELLA - NOVARA":
-                        risultati = await _dataService.GetInfoByTrain(new string[] { "S00070" }, new string[] { "S00248" }, true, @"^11[6|7]\d{2}$"); //BI_NO
-                        break;
-                    case "BIELLA - SANTHIA'":
-                        risultati = await _dataService.GetInfoByTrain(new string[] { "S00070" }, new string[] { "S00240" }, true, @"^117\d{2}$");   //BI_SAN
-                        break;
-                    case "TORINO - MILANO":
-                        risultati = await _dataService.GetInfoByTrain(new string[] { "S00219", "S00452", "S00452" }, new string[] { "S01700", "S01645", "S00248" }, true, @"^2\d{3}$");  //TO_MI CENTR
-                        break;
-
+                    var results = await _dataService.GetInfoByTrain(p.StationCodesFrom.ToList(), p.StationCodesTo.ToList(), true, p.Pattern);
+                    DataItems = new ObservableCollection<DataItem>(results.DataList);
                 }
-                DataItems = new ObservableCollection<DataItem>(risultati.DataList);
-              //  _customerView = CollectionViewSource.GetDefaultView(DataItems);
                 IsBusy = false;
             }
             catch (Exception ex)
@@ -62,7 +70,8 @@ namespace RitardiTreniNet7._0
             }
         }
 
-        private async Task VisualizzaCommandAsync()
+        [RelayCommand]
+        private async Task ShowArrivalsAsync()
         {
             IsBusy = true;
             OutputString = string.Empty;

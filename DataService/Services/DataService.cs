@@ -7,7 +7,7 @@ using DataServiceLibrary.Model;
 using DataServiceLibrary.Responses;
 using RestSharp;
 
-namespace DataServiceLibrary
+namespace DataServiceLibrary.Services
 {
     public class DataService : IDataService
     {
@@ -98,10 +98,10 @@ namespace DataServiceLibrary
             return comunicazione?.Replace("&egrave;", "è");
         }
 
-        public async Task<DataItemExtended> GetInfoByTrain(string[] codiceStazionePartenza, string[] codiceStazioneArrivo, bool isRecursive, string pattern)
+        public async Task<DataItemExtended> GetInfoByTrain(List<string> codiceStazionePartenza, List<string> codiceStazioneArrivo, bool isRecursive, string pattern)
         {
             _elencoTreni.Clear();
-            for (int i = 0; i < codiceStazionePartenza.Length; i++)
+            for (int i = 0; i < codiceStazionePartenza.Count; i++)
             {
                 await GetStazioni(codiceStazionePartenza[i], codiceStazioneArrivo[i], isRecursive, pattern);
             }

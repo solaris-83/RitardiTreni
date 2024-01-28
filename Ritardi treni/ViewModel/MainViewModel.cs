@@ -6,11 +6,10 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
-using DataServiceLibrary;
 using DataServiceLibrary.Model;
+using DataServiceLibrary.Services;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Threading;
 namespace Ritardi_treni.ViewModel
 {
     /// <summary>

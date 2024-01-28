@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataService\DataService.csproj" />
+    <ProjectReference Include="..\DataService\DataServiceLibrary.csproj" />
   </ItemGroup>
 
 </Project>

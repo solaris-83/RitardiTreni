@@ -188,9 +188,9 @@
     <Resource Include="Resources\Entypo-license.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DataService\DataService.csproj">
+    <ProjectReference Include="..\DataService\DataServiceLibrary.csproj">
       <Project>{fa07325d-50b3-4f82-ba29-f4540f853f7c}</Project>
-      <Name>DataService</Name>
+      <Name>DataServiceLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
