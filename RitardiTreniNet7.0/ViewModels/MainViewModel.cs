@@ -14,8 +14,15 @@ namespace RitardiTreniNet7._0
     {
         private readonly IDataService _dataService;
         private readonly ILogger _logger;
-        //private readonly IEnumerable<TrainLine>? _trainLines;
         private readonly IEnumerable<TrainJourneys>? _journeys;
+
+        [ObservableProperty]
+        private DateTime? _dateStart;
+
+        [ObservableProperty]
+        private DateTime? _dateEnd;
+
+        public List<string>? Stations { get; set; }
 
         [ObservableProperty]
         private IEnumerable<string>? _trainJourneys;
@@ -51,6 +58,9 @@ namespace RitardiTreniNet7._0
             using StreamReader stream2 = new StreamReader(@"Resources\journeys.json");
             _journeys = JsonSerializer.Deserialize<IEnumerable<TrainJourneys>>(stream2.ReadToEnd());
             _trainJourneys = _journeys?.Select(t => t.Name).Distinct();
+            LoadStations();
+            DateStart = DateTime.Now.AddDays(-7);
+            DateEnd = DateTime.Now;
         }
 
         partial void OnTrattaSelezionataChanged(string value)
@@ -97,6 +107,27 @@ namespace RitardiTreniNet7._0
                 _logger.LogError(ex, "GetInfoAsync");
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void LoadStations()
+        {
+            Stations ??= new List<string>();
+
+            Stations.Add("BIELLA S.PAOLO");
+            Stations.Add("CARPIGNANO SESIA");
+            Stations.Add("CHIVASSO");
+            Stations.Add("COSSATO");
+            Stations.Add("MAGENTA");
+            Stations.Add("MILANO CENTRALE");
+            Stations.Add("MILANO PORTA GARIBALDI");
+            Stations.Add("NOVARA");
+            Stations.Add("RHO FIERA MILANO");
+            Stations.Add("ROVASENDA");
+            Stations.Add("SALUSSOLA");
+            Stations.Add("SANTHIA`");
+            Stations.Add("TORINO P.NUOVA");
+            Stations.Add("TORINO PORTA SUSA");
+            Stations.Add("VERCELLI");
         }
     }
 }
