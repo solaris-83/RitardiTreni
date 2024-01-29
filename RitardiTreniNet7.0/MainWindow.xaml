@@ -85,7 +85,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label  Grid.Column="0" Grid.Row="0" Content="Numero treno" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="0" Width="150" Height="20" Margin="10" Text="{Binding NumeroTreno}" />
+                <TextBox Grid.Column="1" Grid.Row="0" Width="150" Height="20" Margin="10" Text="{Binding NumeroTreno, UpdateSourceTrigger=PropertyChanged}" />
                 <Label  Grid.Column="0" Grid.Row="1" Content="Nome stazione" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 <Label  Grid.Column="0" Grid.Row="2" Content="Seleziona data" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 <ComboBox  Grid.Column="1" Grid.Row="1" ItemsSource="{Binding Stations}" SelectedItem="{Binding NomeStazione, Mode=TwoWay}" Height="20" Width="150" />

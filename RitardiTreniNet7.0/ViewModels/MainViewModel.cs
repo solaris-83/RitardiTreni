@@ -40,9 +40,11 @@ namespace RitardiTreniNet7._0
         private string _outputString = "";
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(ShowArrivalsCommand))]
         private string _numeroTreno = "";
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(ShowArrivalsCommand))]
         private string _nomeStazione = "";
 
         [ObservableProperty]
@@ -61,6 +63,7 @@ namespace RitardiTreniNet7._0
             LoadStations();
             DateStart = DateTime.Now.AddDays(-7);
             DateEnd = DateTime.Now;
+            ShowArrivalsCommand.NotifyCanExecuteChanged();
         }
 
         partial void OnTrattaSelezionataChanged(string value)
@@ -91,7 +94,12 @@ namespace RitardiTreniNet7._0
             }
         }
 
-        [RelayCommand]
+        private bool CanShowArrivals()
+        {
+            return !string.IsNullOrWhiteSpace(NumeroTreno) && !string.IsNullOrWhiteSpace(NomeStazione);
+        }
+
+        [RelayCommand(CanExecute = nameof(CanShowArrivals))]
         private async Task ShowArrivalsAsync()
         {
             IsBusy = true;
