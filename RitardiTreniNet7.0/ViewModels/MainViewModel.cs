@@ -2,8 +2,10 @@
 using CommunityToolkit.Mvvm.Input;
 using DataServiceLibrary.Model;
 using DataServiceLibrary.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
@@ -15,6 +17,7 @@ namespace RitardiTreniNet7._0
         private readonly IDataService _dataService;
         private readonly ILogger _logger;
         private readonly IEnumerable<TrainJourneys>? _journeys;
+        private readonly IConfiguration _configuration;
 
         [ObservableProperty]
         private DateTime? _dateStart;
@@ -50,9 +53,10 @@ namespace RitardiTreniNet7._0
         [ObservableProperty]
         private DateTime _selectedDate = DateTime.Now;
 
-        public MainViewModel(IDataService dataService, ILogger<MainViewModel> logger)
+        public MainViewModel(IDataService dataService, ILogger<MainViewModel> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
             _dataService = dataService;
             _dataItems = new ObservableCollection<DataItem>();
             using StreamReader stream1 = new StreamReader(@"Resources\lines.json");
