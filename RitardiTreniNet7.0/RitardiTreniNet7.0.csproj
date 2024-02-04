@@ -11,6 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Resources\DLL\**" />
+    <EmbeddedResource Remove="Resources\DLL\**" />
+    <None Remove="Resources\DLL\**" />
+    <Page Remove="Resources\DLL\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="icons8_train_480_Qz7_icon.ico" />
   </ItemGroup>
 
@@ -21,16 +28,15 @@
   <ItemGroup>
     <PackageReference Include="BusyIndicators" Version="2.1.2" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Include="Dapper" Version="2.1.28" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.8" />
-    <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataService\DataServiceLibrary.csproj" />
+    <ProjectReference Include="..\RitardiTreni.Common\RitardiTreni.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,6 +53,12 @@
     <None Update="Resources\SqliteScript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="MVVMDialogsModule">
+      <HintPath>Resources\DLL\MVVMDialogsModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

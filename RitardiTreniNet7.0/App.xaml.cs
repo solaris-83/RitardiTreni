@@ -1,15 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
-using DataServiceLibrary.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using NLog.Extensions.Logging;
 using NLog;
-using System.Data.SQLite;
-using System.Configuration;
-using DataServiceLibrary.Model;
-using RitardiTreniNet7._0.Helpers;
+using RitardiTreni.Common.Helpers;
+using RitardiTreni.Common.Services;
+using MVVMDialogsModule.Views.Interfaces;
+using MVVMDialogsModule.Views.Services;
+using RitardiTreniNet7._0.ViewModels;
 
 namespace RitardiTreniNet7._0
 {
@@ -38,13 +38,23 @@ namespace RitardiTreniNet7._0
                             loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
                             loggingBuilder.AddNLog(@"Resources\nlog.config");
                         })
+                        .AddHttpClient("InfoMobilita", httpClient =>
+                        {
+                            httpClient.BaseAddress = new Uri("http://www.viaggiatreno.it/infomobilita/");
+                        }).Services
+                        .AddHttpClient("Resteasy", httpClient =>
+                        {
+                            httpClient.BaseAddress = new Uri("http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/");
+                        }).Services
                         .AddSingleton(configuration)
+                        .AddTransient<IDialogService, DialogService>()
+                        .AddSingleton<IDbContextService, DbContextService>()
                         .AddSingleton<IDataService, DataService>()
+                        .AddTransient<MessageNotificationViewModel>()
                         .AddSingleton<MainViewModel>()
                         .BuildServiceProvider());
+                //DialogService.AutoRegisterDialogs<App>();
                 SQLiteDbHelper.CreateDb(configuration);
-                
-
             }
             catch (Exception ex)
             {

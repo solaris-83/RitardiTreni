@@ -7,14 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RitardiTreniNet7._0.Helpers
+namespace DataServiceLibrary.Helpers
 {
     public static class SQLiteDbHelper
     {
         public static void CreateDb(IConfiguration configuration)
         {
             SQLiteConnection.CreateFile("myDb.db");
-            using var conn = new SQLiteConnection(configuration.GetConnectionString("DefaultConnection"));
+            var conn = new SQLiteConnection(configuration.GetConnectionString("DefaultConnection"));
             {
                 conn.Open();
                 string strSql = File.ReadAllText(@"Resources\SqliteScript.sql");

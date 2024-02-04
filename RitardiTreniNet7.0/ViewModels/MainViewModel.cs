@@ -1,11 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DataServiceLibrary.Model;
-using DataServiceLibrary.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MVVMDialogsModule.Views.Interfaces;
+using MVVMDialogsModule.Views.Models;
+using RitardiTreni.Common.Model;
+using RitardiTreni.Common.Services;
+using RitardiTreniNet7._0.ViewModels;
 using System.Collections.ObjectModel;
-using System.Configuration;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
@@ -18,6 +20,7 @@ namespace RitardiTreniNet7._0
         private readonly ILogger _logger;
         private readonly IEnumerable<TrainJourneys>? _journeys;
         private readonly IConfiguration _configuration;
+        private readonly IDialogService _dialogService;
 
         [ObservableProperty]
         private DateTime? _dateStart;
@@ -53,8 +56,9 @@ namespace RitardiTreniNet7._0
         [ObservableProperty]
         private DateTime _selectedDate = DateTime.Now;
 
-        public MainViewModel(IDataService dataService, ILogger<MainViewModel> logger, IConfiguration configuration)
+        public MainViewModel(IDataService dataService, ILogger<MainViewModel> logger, IConfiguration configuration, IDialogService dialogService)
         {
+            _dialogService = dialogService;
             _logger = logger;
             _configuration = configuration;
             _dataService = dataService;
@@ -85,7 +89,7 @@ namespace RitardiTreniNet7._0
                 var p = _journeys?.FirstOrDefault(t => t.Name == TrattaSelezionata);
                 if (p != null)
                 {
-                    var results = await _dataService.GetInfoByTrain(p.StationCodesFrom.ToList(), p.StationCodesTo.ToList(), true, p.Pattern);
+                    var results = await _dataService.GetInfoByTrainAsync(p.StationCodesFrom.ToList(), p.StationCodesTo.ToList(), true, p.Pattern);
                     DataItems = new ObservableCollection<DataItem>(results.DataList);
                 }
                 IsBusy = false;
@@ -110,8 +114,12 @@ namespace RitardiTreniNet7._0
             OutputString = string.Empty;
             try
             {
-                OutputString = await _dataService.MostraArrivo(NumeroTreno, NomeStazione, SelectedDate);
+                OutputString = await _dataService.ShowArrivalsAsync(NumeroTreno, NomeStazione, SelectedDate);
                 IsBusy = false;
+                _dialogService.ShowDialog<MessageNotificationViewModel, bool>(new DialogParameters
+                {
+                    { "Message", OutputString }
+                });
             }
             catch (Exception ex)
             {
