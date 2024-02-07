@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net7.0-windows</TargetFramework>
-    <RootNamespace>RitardiTreniNet7._0</RootNamespace>
+    <RootNamespace>RitardiTreniNet7</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\MVVMDialogsModule\MVVMDialogsModule.Views\MVVMDialogsModule.csproj" />
     <ProjectReference Include="..\RitardiTreni.Common\RitardiTreni.Common.csproj" />
   </ItemGroup>
 
@@ -53,12 +54,6 @@
     <None Update="Resources\SqliteScript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="MVVMDialogsModule">
-      <HintPath>Resources\DLL\MVVMDialogsModule.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

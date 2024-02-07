@@ -9,9 +9,10 @@ using RitardiTreni.Common.Helpers;
 using RitardiTreni.Common.Services;
 using MVVMDialogsModule.Views.Interfaces;
 using MVVMDialogsModule.Views.Services;
-using RitardiTreniNet7._0.ViewModels;
+using RitardiTreniNet7.ViewModels;
+using MVVMDialogsModule.Interfaces;
 
-namespace RitardiTreniNet7._0
+namespace RitardiTreniNet7
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -47,13 +48,14 @@ namespace RitardiTreniNet7._0
                             httpClient.BaseAddress = new Uri("http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/");
                         }).Services
                         .AddSingleton(configuration)
+                        .AddSingleton<IWindowSupport, WindowSupport>()
                         .AddTransient<IDialogService, DialogService>()
                         .AddSingleton<IDbContextService, DbContextService>()
                         .AddSingleton<IDataService, DataService>()
                         .AddTransient<MessageNotificationViewModel>()
                         .AddSingleton<MainViewModel>()
                         .BuildServiceProvider());
-                //DialogService.AutoRegisterDialogs<App>();
+                DialogService.AutoRegisterDialogs<App>();
                 SQLiteDbHelper.CreateDb(configuration);
             }
             catch (Exception ex)

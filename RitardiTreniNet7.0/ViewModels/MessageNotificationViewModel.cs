@@ -4,7 +4,7 @@ using MVVMDialogsModule.Views.Interfaces;
 using MVVMDialogsModule.Views.Models;
 using System.Windows.Input;
 
-namespace RitardiTreniNet7._0.ViewModels
+namespace RitardiTreniNet7.ViewModels
 {
     internal partial class MessageNotificationViewModel : ObservableObject, IDialogViewModel
     {
@@ -29,11 +29,6 @@ namespace RitardiTreniNet7._0.ViewModels
 
         public ICommand CancelCommand => throw new NotImplementedException();
 
-        public void DialogClosing()
-        {
-            
-        }
-
         public void OnDialogClosed(DialogParameters dialogParameters)
         {
             
@@ -43,6 +38,11 @@ namespace RitardiTreniNet7._0.ViewModels
         {
             if (dialogParameters.TryGetValue("Message", out object? value))
                 Message = value.ToString();
+        }
+
+        public void OnDialogClosing()
+        {
+            throw new NotImplementedException();
         }
     }
 }

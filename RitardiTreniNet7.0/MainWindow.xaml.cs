@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.DependencyInjection;
-using MVVMDialogsModule.Views.Models;
 using System.Windows;
 
-namespace RitardiTreniNet7._0
+namespace RitardiTreniNet7
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

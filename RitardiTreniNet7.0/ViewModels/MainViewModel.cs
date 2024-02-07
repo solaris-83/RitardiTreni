@@ -6,13 +6,13 @@ using MVVMDialogsModule.Views.Interfaces;
 using MVVMDialogsModule.Views.Models;
 using RitardiTreni.Common.Model;
 using RitardiTreni.Common.Services;
-using RitardiTreniNet7._0.ViewModels;
+using RitardiTreniNet7.ViewModels;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
 
-namespace RitardiTreniNet7._0
+namespace RitardiTreniNet7
 {
     public partial class MainViewModel : ObservableObject
     {
@@ -98,7 +98,10 @@ namespace RitardiTreniNet7._0
             {
                 IsBusy = false;
                 _logger.LogError(ex, "GetInfoAsync");
-                MessageBox.Show(ex.Message);
+                _dialogService.ShowDialog<MessageNotificationViewModel>(new DialogParameters
+                {
+                    { "Message", ex.Message }
+                });
             }
         }
 
@@ -116,16 +119,15 @@ namespace RitardiTreniNet7._0
             {
                 OutputString = await _dataService.ShowArrivalsAsync(NumeroTreno, NomeStazione, SelectedDate);
                 IsBusy = false;
-                _dialogService.ShowDialog<MessageNotificationViewModel, bool>(new DialogParameters
-                {
-                    { "Message", OutputString }
-                });
             }
             catch (Exception ex)
             {
                 IsBusy = false;
-                _logger.LogError(ex, "GetInfoAsync");
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                _logger.LogError(ex, "ShowArrivalsAsync");
+                _dialogService.ShowDialog<MessageNotificationViewModel>(new DialogParameters
+                {
+                    { "Message", ex.Message }
+                });
             }
         }
 
