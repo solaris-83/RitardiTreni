@@ -4,6 +4,7 @@ using RitardiTreni.Common.Responses;
 using RestSharp;
 using System.Text.Json;
 using System.Net.Http;
+using Microsoft.Extensions.Logging;
 
 namespace RitardiTreni.Common.Services
 {
@@ -14,8 +15,10 @@ namespace RitardiTreni.Common.Services
         private const string BASE_PATH_1 = BASE_PATH + "/resteasy/viaggiatreno";
         private const string BASE_PATH = "http://www.viaggiatreno.it/infomobilita";
         private readonly IHttpClientFactory _httpClientFactory;
-        public DataService(IHttpClientFactory httpClientFactory)
+        private readonly ILogger _logger;
+        public DataService(IHttpClientFactory httpClientFactory, ILogger<DataService> logger)
         {
+            _logger = logger;
             _httpClientFactory = httpClientFactory;
             _elencoTreni = new List<(string, string)>();
             dataList = new DataItemExtended();
@@ -35,7 +38,11 @@ namespace RitardiTreni.Common.Services
                     if ((veh.categoria == "235" && veh.categoriaDescrizione == "RV") || (veh.categoria == "197" && veh.categoriaDescrizione == "Regionale"))
                     {
                         if (!_elencoTreni.Contains((veh.numeroTreno, codiceStazionePartenza)) && Regex.IsMatch(veh.numeroTreno, pattern))
+                        {
                             _elencoTreni.Add((veh.numeroTreno, codiceStazionePartenza));
+                            _logger.LogInformation("Numero treno ->" + veh.numeroTreno);
+                        }
+                            
                     }
                 }));
 
@@ -120,30 +127,39 @@ namespace RitardiTreni.Common.Services
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                    var response = await JsonSerializer.DeserializeAsync<OrarioTreni>(contentStream);
-                    if (response != null)
+                    try
                     {
-                        if (response.fermate != null)
-                        {
-                            string[] input = new string[3] { response.tipoTreno, response.provvedimento.ToString(), response.subTitle };
-                            var statoTreno = GetStatoTreno(input);
-                            if (response.fermate.Count > 0)
-                            {
-                                response.fermate.ForEach(f =>
-                                    {
-                                        dataList.DataList.Add(new DataItem(treno.Item1, f.stazione, f.ritardo, string.IsNullOrEmpty(statoTreno) ? UnixTimeStampToDateTime(double.Parse(f.programmata.ToString())).ToString("HH:mm") : statoTreno, f.tipoFermata == "A" || f.tipoFermata == "P"));
-                                    });
-                            }
-                            else
-                            {
-                                dataList.DataList.Add(new DataItem(treno.Item1, "", 0, string.IsNullOrEmpty(statoTreno) ? "" : statoTreno, true));
-                            }
-                        }
 
-                        dataList.OraUltimoRilevamento = response.oraUltimoRilevamento != null ? UnixTimeStampToDateTime(double.Parse(response.oraUltimoRilevamento.ToString())).ToString("HH:mm") : "";
-                        dataList.StazioneUltimoRilevamente = response.stazioneUltimoRilevamento;
-                        dataList.Categoria = response.categoria;
-                        dataList.NumeroTreno = response.numeroTreno.ToString();
+
+                        var response = await JsonSerializer.DeserializeAsync<OrarioTreni>(contentStream);
+                        if (response != null)
+                        {
+                            if (response.fermate != null)
+                            {
+                                string[] input = new string[3] { response.tipoTreno, response.provvedimento.ToString(), response.subTitle };
+                                var statoTreno = GetStatoTreno(input);
+                                if (response.fermate.Count > 0)
+                                {
+                                    response.fermate.ForEach(f =>
+                                        {
+                                            dataList.DataList.Add(new DataItem(treno.Item1, f.stazione, f.ritardo, string.IsNullOrEmpty(statoTreno) ? UnixTimeStampToDateTime(double.Parse(f.programmata.ToString())).ToString("HH:mm") : statoTreno, f.tipoFermata == "A" || f.tipoFermata == "P"));
+                                        });
+                                }
+                                else
+                                {
+                                    dataList.DataList.Add(new DataItem(treno.Item1, "", 0, string.IsNullOrEmpty(statoTreno) ? "" : statoTreno, true));
+                                }
+                            }
+
+                            dataList.OraUltimoRilevamento = response.oraUltimoRilevamento != null ? UnixTimeStampToDateTime(double.Parse(response.oraUltimoRilevamento.ToString())).ToString("HH:mm") : "";
+                            dataList.StazioneUltimoRilevamente = response.stazioneUltimoRilevamento;
+                            dataList.Categoria = response.categoria;
+                            dataList.NumeroTreno = response.numeroTreno.ToString();
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        _logger.LogError(ex, $"Andamento in errore per treno {treno.Item1} e codice stazione {treno.Item2}");
                     }
                 }
             }
