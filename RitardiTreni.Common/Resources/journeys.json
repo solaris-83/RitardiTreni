@@ -1,6 +1,6 @@
 [
   {
-    "Name": "BIELLA - NOVARA",
+    "Name": "BIELLA S.PAOLO- NOVARA",
     "StationCodesFrom": [
       "S00070"
     ],
@@ -10,12 +10,12 @@
     "Pattern": "^11[6|7]\\d{2}$"
   },
   {
-    "Name": "BIELLA - SANTHIA",
+    "Name": "BIELLA S.PAOLO - SANTHIA'",
     "StationCodesFrom": [
       "S00070"
     ],
     "StationCodesTo": [
-      "S00248"
+      "S00240"
     ],
     "Pattern": "^117\\d{2}$"
   },

@@ -11,6 +11,8 @@ using MVVMDialogsModule.Views.Interfaces;
 using MVVMDialogsModule.Views.Services;
 using RitardiTreniNet7.ViewModels;
 using MVVMDialogsModule.Interfaces;
+using System.Net.Http;
+using System.Net;
 
 namespace RitardiTreniNet7
 {
@@ -46,7 +48,8 @@ namespace RitardiTreniNet7
                         .AddHttpClient("Resteasy", httpClient =>
                         {
                             httpClient.BaseAddress = new Uri("http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/");
-                        }).Services
+                        })
+                        .Services
                         .AddSingleton(configuration)
                         .AddSingleton<IWindowSupport, WindowSupport>()
                         .AddTransient<IDialogService, DialogService>()
@@ -63,6 +66,11 @@ namespace RitardiTreniNet7
                 // NLog: catch any exception and log it.
                 logger.Error(ex, "Stopped program because of exception");
             }
+        }
+
+        private HttpMessageHandler yyy()
+        {
+            return new HttpClientHandler() { CookieContainer = new CookieContainer() };
         }
 
         protected override void OnExit(ExitEventArgs e)

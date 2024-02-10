@@ -3,14 +3,14 @@ using RitardiTreni.Common.Model;
 using RitardiTreni.Common.Responses;
 using RestSharp;
 using System.Text.Json;
-using System.Net.Http;
 using Microsoft.Extensions.Logging;
+using System.Web;
+using System.Net;
 
 namespace RitardiTreni.Common.Services
 {
     public class DataService : IDataService
     {
-        List<(string, string)> _elencoTreni;
         DataItemExtended dataList;
         private const string BASE_PATH_1 = BASE_PATH + "/resteasy/viaggiatreno";
         private const string BASE_PATH = "http://www.viaggiatreno.it/infomobilita";
@@ -20,150 +20,142 @@ namespace RitardiTreni.Common.Services
         {
             _logger = logger;
             _httpClientFactory = httpClientFactory;
-            _elencoTreni = new List<(string, string)>();
             dataList = new DataItemExtended();
         }
-
-        private async Task GetStationsAsync(HttpClient httpClient, string codiceStazionePartenza, string codiceStazioneArrivo, bool isRecursive, string pattern)
-        {
-            var dataOra = DateTime.Now.ToString("yyyy-MM-ddT00:00:00");
-            string uri = $@"soluzioniViaggioNew/{codiceStazionePartenza.TrimStart(new char[] { 'S', '0' })}/{codiceStazioneArrivo.TrimStart(new char[] { 'S', '0' })}/{DateTime.Now.ToString("yyyy-MM-ddT00:00:00")}";
-            var httpResponseMessage = await httpClient.GetAsync(uri);
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                var response = await JsonSerializer.DeserializeAsync<ElencoNumeriTreni>(contentStream);
-                response?.soluzioni?.ForEach(sol => sol.vehicles.ForEach(veh =>
-                {
-                    if ((veh.categoria == "235" && veh.categoriaDescrizione == "RV") || (veh.categoria == "197" && veh.categoriaDescrizione == "Regionale"))
-                    {
-                        if (!_elencoTreni.Contains((veh.numeroTreno, codiceStazionePartenza)) && Regex.IsMatch(veh.numeroTreno, pattern))
-                        {
-                            _elencoTreni.Add((veh.numeroTreno, codiceStazionePartenza));
-                            _logger.LogInformation("Numero treno ->" + veh.numeroTreno);
-                        }
-                            
-                    }
-                }));
-
-                if (!isRecursive)
-                {
-                    _elencoTreni.OrderBy(s => s.Item1);
-                    return;
-                }
-                await GetStationsAsync(httpClient, codiceStazioneArrivo, codiceStazionePartenza, false, pattern);
-                _elencoTreni.OrderBy(s => s.Item1);
-            }
-        }
-
 
         public async Task<string> ShowArrivalsAsync(string numeroTreno, string nomeStazione, DateTime dataSelezionata)
         {
             string comunicazione = "";
-            using (var clientTreno = new RestClient(BASE_PATH_1))
+            using (var httpClient = _httpClientFactory.CreateClient("Resteasy"))
             {
-                var requestTreno = new RestRequest(@"autocompletaStazione/{stazione}")
+                string uri = $@"autocompletaStazione/{(nomeStazione.Length > 20 ? nomeStazione.Substring(0, 20) : nomeStazione)}";
+                var httpResponseMessage = await httpClient.GetAsync(uri);
+                if (httpResponseMessage.IsSuccessStatusCode)
                 {
-                    RequestFormat = DataFormat.None
-                };
-                requestTreno.AddHeader("Accept", "text/plain");
-                requestTreno.AddUrlSegment("stazione", nomeStazione.Length > 20 ? nomeStazione.Substring(0, 20) : nomeStazione);
+                    var responseToParse = await httpResponseMessage.Content.ReadAsStringAsync();
+                    responseToParse?.TrimEnd('\r', '\n');
+                    if (string.IsNullOrEmpty(responseToParse))
+                        return comunicazione;
+                    var info_1 = responseToParse.Split('\n')[0].Split('|');
+                    if (info_1[0] != nomeStazione)
+                        return comunicazione;
+                    var info_2 = info_1[1].Split('-');
 
-                var responseTreno = await clientTreno.GetAsync(requestTreno);
-                var responseToParse = responseTreno.Content?.ToString().TrimEnd('\r', '\n');
-                if (string.IsNullOrEmpty(responseToParse))
-                    return comunicazione;
-                var info_1 = responseToParse.Split('\n')[0].Split('|');
-                if (info_1[0] != nomeStazione)
-                    return comunicazione;
-                var info_2 = info_1[1].Split('-');
-                using (var client = new RestClient(BASE_PATH))
-                {
-                    var request = new RestRequest("StampaTreno");
-
-                    request.AddQueryParameter("numTreno", numeroTreno);
-                    request.AddQueryParameter("locArrivo", info_2[0]);
-                    request.AddQueryParameter("locArrivoDesc", nomeStazione);
-                    request.AddQueryParameter("date", dataSelezionata.ToString("dd-MM-yyyy"));
-
-                    var response = await client.PostAsync(request);
-                    if (response != null)
-                    {
-
-                        var cookie = response.Cookies["JSESSIONID"];
-                        if (cookie != null)
-                            request.AddCookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain);
-                        if (string.IsNullOrEmpty(comunicazione))
+                    var baseAddress = new Uri("http://www.viaggiatreno.it/infomobilita/");
+                    var cookieContainer = new CookieContainer();
+                    using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
+                    using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
+                    { 
+                        var queryParameters = new Dictionary<string, string>
                         {
-                            request.AddQueryParameter("numTreno", numeroTreno);
-                            request.AddQueryParameter("locArrivo", info_2[0]);
-                            request.AddQueryParameter("locArrivoDesc", nomeStazione);
-                            request.AddQueryParameter("date", dataSelezionata.ToString("dd-MM-yyyy"));
-                            var response1 = await client.PostAsync<ComunicazioneArrivo>(request);
-                            comunicazione = response1?.comunicazione ?? "";
+                            { "numTreno", numeroTreno },
+                            { "locArrivo", info_2[0]},
+                            { "locArrivoDesc", nomeStazione },
+                            { "date", dataSelezionata.ToString("dd-MM-yyyy")}
+                        };
+                        client.DefaultRequestHeaders.Add("Accept", "text/plain");
+                        var dictFormUrlEncoded = new FormUrlEncodedContent(queryParameters);
+                        var httpResponseMessage1 = await client.PostAsync("StampaTreno", dictFormUrlEncoded);
+                        if (httpResponseMessage1.IsSuccessStatusCode)
+                        {
+                            using var resp = await httpResponseMessage1.Content.ReadAsStreamAsync();
+                            var c = cookieContainer.GetAllCookies();
+                            var jsessionID = c.SingleOrDefault(c => c.Name == "JSESSIONID")?.Value;
+                            if (!string.IsNullOrWhiteSpace(jsessionID))
+                            {
+                                httpResponseMessage1 = await client.PostAsync("StampaTreno", dictFormUrlEncoded);
+                                if (httpResponseMessage1.IsSuccessStatusCode)
+                                {
+                                    var response1 = await httpResponseMessage1.Content.ReadAsStringAsync();
+                                    var com = JsonSerializer.Deserialize<ComunicazioneArrivo>(response1);
+                                    comunicazione = com?.comunicazione ?? "Errore";
+                                }
+                            }
+                            else
+                            {
+                                comunicazione = "Errore JSESSIONID";
+                            }
                         }
+                        else
+                            comunicazione = "Errore";
                     }
-                    else
-                        comunicazione = "Riprova";
                 }
             }
             return comunicazione?.Replace("&egrave;", "è") ?? "";
         }
 
-        public async Task<DataItemExtended> GetInfoByTrainAsync(List<string> codiceStazionePartenza, List<string> codiceStazioneArrivo, bool isRecursive, string pattern)
+        public async Task<DataItemExtended> GetInfoByTrainAsync(List<string> codiceStazionePartenza, List<string> codiceStazioneArrivo, string pattern)
         {
-            _elencoTreni.Clear();
-            var httpClient = _httpClientFactory.CreateClient("Resteasy");
-            for (int i = 0; i < codiceStazionePartenza.Count; i++)
+            using (var httpClient = _httpClientFactory.CreateClient("Resteasy"))
             {
-                await GetStationsAsync(httpClient, codiceStazionePartenza[i], codiceStazioneArrivo[i], isRecursive, pattern);
-            }
-
-            dataList = new DataItemExtended();
-            foreach (var treno in _elencoTreni)
-            {
-                var uri = $@"andamentoTreno/{treno.Item2}/{treno.Item1}/{DateTimeToUnixTimeStamp(DateTime.Today)}";
-                var httpResponseMessage = await httpClient.GetAsync(uri);
-                if (httpResponseMessage.IsSuccessStatusCode)
+                var elencoTreni = new List<(string, string)>();
+                for (int i = 0; i < codiceStazionePartenza.Count; i++)
                 {
-                    using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                    try
+                    var dataOra = DateTime.Now.ToString("yyyy-MM-ddT00:00:00");
+                    string uri = $@"soluzioniViaggioNew/{codiceStazionePartenza[i].TrimStart(new char[] { 'S', '0' })}/{codiceStazioneArrivo[i].TrimStart(new char[] { 'S', '0' })}/{DateTime.Now.ToString("yyyy-MM-ddT00:00:00")}";
+                    var httpResponseMessage = await httpClient.GetAsync(uri);
+                    if (httpResponseMessage.IsSuccessStatusCode)
                     {
-
-
-                        var response = await JsonSerializer.DeserializeAsync<OrarioTreni>(contentStream);
-                        if (response != null)
+                        using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+                        var response = await JsonSerializer.DeserializeAsync<ElencoNumeriTreni>(contentStream);
+                        response?.soluzioni?.ForEach(sol => sol.vehicles.ForEach(veh =>
                         {
-                            if (response.fermate != null)
+                            if ((veh.categoria == "235" && veh.categoriaDescrizione == "RV") || (veh.categoria == "197" && veh.categoriaDescrizione == "Regionale"))
                             {
-                                string[] input = new string[3] { response.tipoTreno, response.provvedimento.ToString(), response.subTitle };
-                                var statoTreno = GetStatoTreno(input);
-                                if (response.fermate.Count > 0)
+                                if (!elencoTreni.Contains((veh.numeroTreno, codiceStazionePartenza[i])) && Regex.IsMatch(veh.numeroTreno, pattern))
                                 {
-                                    response.fermate.ForEach(f =>
-                                        {
-                                            dataList.DataList.Add(new DataItem(treno.Item1, f.stazione, f.ritardo, string.IsNullOrEmpty(statoTreno) ? UnixTimeStampToDateTime(double.Parse(f.programmata.ToString())).ToString("HH:mm") : statoTreno, f.tipoFermata == "A" || f.tipoFermata == "P"));
-                                        });
-                                }
-                                else
-                                {
-                                    dataList.DataList.Add(new DataItem(treno.Item1, "", 0, string.IsNullOrEmpty(statoTreno) ? "" : statoTreno, true));
+                                    elencoTreni.Add((veh.numeroTreno, codiceStazionePartenza[i]));
                                 }
                             }
+                        }));
 
-                            dataList.OraUltimoRilevamento = response.oraUltimoRilevamento != null ? UnixTimeStampToDateTime(double.Parse(response.oraUltimoRilevamento.ToString())).ToString("HH:mm") : "";
-                            dataList.StazioneUltimoRilevamente = response.stazioneUltimoRilevamento;
-                            dataList.Categoria = response.categoria;
-                            dataList.NumeroTreno = response.numeroTreno.ToString();
-                        }
+                        elencoTreni.OrderBy(s => s.Item1);
                     }
-                    catch(Exception ex)
+                }
+
+                dataList = new DataItemExtended();
+                foreach (var treno in elencoTreni)
+                {
+                    var uri = $@"andamentoTreno/{treno.Item2}/{treno.Item1}/{DateTimeToUnixTimeStamp(DateTime.Today)}";
+                    var httpResponseMessage = await httpClient.GetAsync(uri);
+                    if (httpResponseMessage.IsSuccessStatusCode)
                     {
-                        _logger.LogError(ex, $"Andamento in errore per treno {treno.Item1} e codice stazione {treno.Item2}");
+                        using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync();
+                        try
+                        {
+                            var response = await JsonSerializer.DeserializeAsync<OrarioTreni>(contentStream);
+                            if (response != null)
+                            {
+                                if (response.fermate != null)
+                                {
+                                    string[] input = new string[3] { response.tipoTreno, response.provvedimento.ToString(), response.subTitle };
+                                    var statoTreno = GetStatoTreno(input);
+                                    if (response.fermate.Count > 0)
+                                    {
+                                        response.fermate.ForEach(f =>
+                                            {
+                                                dataList.DataList.Add(new DataItem(treno.Item1, f.stazione, f.ritardo, string.IsNullOrEmpty(statoTreno) ? UnixTimeStampToDateTime(double.Parse(f.programmata.ToString())).ToString("HH:mm") : statoTreno, f.tipoFermata == "A" || f.tipoFermata == "P"));
+                                            });
+                                    }
+                                    else
+                                    {
+                                        dataList.DataList.Add(new DataItem(treno.Item1, "", 0, string.IsNullOrEmpty(statoTreno) ? "" : statoTreno, true));
+                                    }
+                                }
+
+                                dataList.OraUltimoRilevamento = response.oraUltimoRilevamento != null ? UnixTimeStampToDateTime(double.Parse(response.oraUltimoRilevamento.ToString())).ToString("HH:mm") : "";
+                                dataList.StazioneUltimoRilevamente = response.stazioneUltimoRilevamento;
+                                dataList.Categoria = response.categoria;
+                                dataList.NumeroTreno = response.numeroTreno.ToString();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Andamento in errore per treno {treno.Item1} e codice stazione {treno.Item2}");
+                        }
                     }
                 }
             }
-            httpClient.Dispose();
             return dataList;
         }
 

@@ -89,8 +89,10 @@ namespace RitardiTreniNet7
                 var p = _journeys?.FirstOrDefault(t => t.Name == TrattaSelezionata);
                 if (p != null)
                 {
-                    var results = await _dataService.GetInfoByTrainAsync(p.StationCodesFrom.ToList(), p.StationCodesTo.ToList(), true, p.Pattern);
-                    DataItems = new ObservableCollection<DataItem>(results.DataList);
+                    var task1 = _dataService.GetInfoByTrainAsync(p.StationCodesFrom, p.StationCodesTo, p.Pattern);
+                    var task2 = _dataService.GetInfoByTrainAsync(p.StationCodesTo, p.StationCodesFrom, p.Pattern);
+                    var results = await Task.WhenAll( task1, task2 );
+                    DataItems = new ObservableCollection<DataItem>(results.SelectMany(r => r.DataList));
                 }
                 IsBusy = false;
             }
