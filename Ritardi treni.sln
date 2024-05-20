@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RitardiTreniNet7", "RitardiTreniNet7.0\RitardiTreniNet7.csproj", "{2D5ABD68-0EAD-452D-8B30-5E4E91A30139}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RitardiTreni.Common", "RitardiTreni.Common\RitardiTreni.Common.csproj", "{1A2819FB-1C69-431A-B1FE-4A3F34F87C2A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RitardiTreniNet8", "RitardiTreniNet8.0\RitardiTreniNet8.csproj", "{52E5FA9D-9573-4F0E-938D-5AE5019F37FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2D5ABD68-0EAD-452D-8B30-5E4E91A30139}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D5ABD68-0EAD-452D-8B30-5E4E91A30139}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2D5ABD68-0EAD-452D-8B30-5E4E91A30139}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2D5ABD68-0EAD-452D-8B30-5E4E91A30139}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1A2819FB-1C69-431A-B1FE-4A3F34F87C2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1A2819FB-1C69-431A-B1FE-4A3F34F87C2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A2819FB-1C69-431A-B1FE-4A3F34F87C2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A2819FB-1C69-431A-B1FE-4A3F34F87C2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52E5FA9D-9573-4F0E-938D-5AE5019F37FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52E5FA9D-9573-4F0E-938D-5AE5019F37FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52E5FA9D-9573-4F0E-938D-5AE5019F37FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52E5FA9D-9573-4F0E-938D-5AE5019F37FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -151,6 +151,7 @@ namespace RitardiTreniNet7
             Stations.Add("SANTHIA`");
             Stations.Add("TORINO P.NUOVA");
             Stations.Add("TORINO PORTA SUSA");
+            Stations.Add("TORINO STURA");
             Stations.Add("VERCELLI");
         }
     }

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <RootNamespace>RitardiTreniNet7</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -36,8 +36,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MVVMDialogsModule\MVVMDialogsModule.Views\MVVMDialogsModule.csproj" />
     <ProjectReference Include="..\RitardiTreni.Common\RitardiTreni.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="MVVMDialogsModule">
+      <HintPath>..\..\MVVMDialogsModule\MVVMDialogsModule.Views\bin\Release\net8.0-windows\MVVMDialogsModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
