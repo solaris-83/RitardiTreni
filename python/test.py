@@ -1,7 +1,7 @@
 from time import strftime
 import unittest
 from apitr import apitr
-import datetime
+from datetime import datetime
 
 class TestApitr(unittest.IsolatedAsyncioTestCase):
     
