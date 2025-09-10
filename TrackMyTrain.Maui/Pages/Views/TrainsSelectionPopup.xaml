@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TrackMyTrain.Maui.Pages.Views.TrainsSelectionPopup">
+    
+
+        <StackLayout Spacing="0">
+            <!-- Header -->
+            <StackLayout HorizontalOptions="Start"
+                         BackgroundColor="White">
+                <Label Text="Select a train"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="#1F2937"
+                       HorizontalOptions="Start" />
+            </StackLayout>
+
+            <!-- Train Options -->
+            <StackLayout 
+                         
+                         BackgroundColor="White">
+
+                <!-- Train Option 1 - EAV A 2132 -->
+                <StackLayout Spacing="12">
+
+                    <!-- Train Type and Number -->
+                    <StackLayout Orientation="Horizontal" Spacing="12">
+                        <Frame BackgroundColor="#F3F4F6"
+                               CornerRadius="8"
+                               
+                               HasShadow="False"
+                               VerticalOptions="Center">
+                            <Label Text="EAV"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="#6B7280" />
+                        </Frame>
+
+                        <Frame BackgroundColor="#F3F4F6"
+                               CornerRadius="8"
+                               
+                               HasShadow="False"
+                               VerticalOptions="Center">
+                            <Label Text="A 2132"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="#6B7280" />
+                        </Frame>
+                    </StackLayout>
+
+                    <!-- Route Information -->
+                    <StackLayout Spacing="8">
+
+                        <!-- Departure -->
+                        <StackLayout Orientation="Horizontal" Spacing="12">
+                            <Frame BackgroundColor="#10B981"
+                                   CornerRadius="8"
+                                   Padding="0"
+                                   HasShadow="False"
+                                   VerticalOptions="Center">
+                                <!-- Filled circle for departure -->
+                            </Frame>
+                            
+                            <Label Text="Piscinola"
+                                   FontSize="16"
+                                   TextColor="#1F2937"
+                                   VerticalOptions="Center" />
+                        </StackLayout>
+
+                        <!-- Arrival -->
+                        <StackLayout Orientation="Horizontal" Spacing="12">
+                            <Frame BackgroundColor="Transparent"
+                                   BorderColor="#D1D5DB"
+                                   CornerRadius="8"
+                                   Padding="0"
+                                   HasShadow="False"
+                                   VerticalOptions="Center">
+                                <!-- Empty circle for arrival -->
+                            </Frame>
+                            
+                            <Label Text="Aversa Centro"
+                                   FontSize="15"
+                                   TextColor="#1F2937"
+                                   VerticalOptions="Center" />
+                        </StackLayout>
+
+                    </StackLayout>
+                </StackLayout>
+
+                <!-- Separator Line -->
+                <BoxView BackgroundColor="#E5E7EB"
+                         HeightRequest="1"
+                         HorizontalOptions="Center" />
+
+             
+
+                <!-- Action Buttons --><!--
+                <StackLayout Orientation="Horizontal" 
+                             Spacing="12" 
+                             Margin="0,16,0,0">
+                    <Button Text="Cancel"
+                            BackgroundColor="Transparent"
+                            TextColor="#6B7280"
+                            BorderColor="#D1D5DB"
+                            BorderWidth="1"
+                            CornerRadius="8"
+                            FontSize="16"
+                            Padding="16,12"
+                            HorizontalOptions="FillAndExpand"
+                            x:Name="CancelButton"
+                            Clicked="OnCancelClicked" />
+
+                    <Button Text="Select"
+                            BackgroundColor="#10B981"
+                            TextColor="White"
+                            CornerRadius="8"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            Padding="16,12"
+                            HorizontalOptions="FillAndExpand"
+                            x:Name="SelectButton"
+                            Clicked="OnSelectClicked" />
+                </StackLayout>-->
+
+            </StackLayout>
+
+        </StackLayout>
+
+</ContentView>

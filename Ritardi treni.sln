@@ -9,6 +9,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataService", "DataService\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RitardiTreniBlazorServer", "RitardiTreniBlazorServer\RitardiTreniBlazorServer.csproj", "{0A0BFB2A-E6C5-450E-A431-7948862BEE9D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackMyTrain.Maui", "TrackMyTrain.Maui\TrackMyTrain.Maui.csproj", "{05C7F4D8-B08F-407B-9B63-2D7702FDF91F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackMyTrain.Data.Interfaces", "TrackMyTrain.Data.Interfaces\TrackMyTrain.Data.Interfaces.csproj", "{D38D6E40-218D-4166-8239-40169E1A121C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackMyTrain.Data.Implementations", "TrackMyTrain.Data.Implementations\TrackMyTrain.Data.Implementations.csproj", "{A99E2B60-ADE4-436F-BE09-F9407F61F3D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackMyTrain.StationsDumper", "TrackMyTrain.StationsDumper\TrackMyTrain.StationsDumper.csproj", "{52AF1179-D916-4EC9-ADF7-D52129E697A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackMyTrain.Data.Services", "TrackMyTrain.Data.Services\TrackMyTrain.Data.Services.csproj", "{CCC23C01-00A5-4093-8FE6-C928533C17AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +37,27 @@ Global
 		{0A0BFB2A-E6C5-450E-A431-7948862BEE9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A0BFB2A-E6C5-450E-A431-7948862BEE9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A0BFB2A-E6C5-450E-A431-7948862BEE9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05C7F4D8-B08F-407B-9B63-2D7702FDF91F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05C7F4D8-B08F-407B-9B63-2D7702FDF91F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05C7F4D8-B08F-407B-9B63-2D7702FDF91F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{05C7F4D8-B08F-407B-9B63-2D7702FDF91F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05C7F4D8-B08F-407B-9B63-2D7702FDF91F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D38D6E40-218D-4166-8239-40169E1A121C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D38D6E40-218D-4166-8239-40169E1A121C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D38D6E40-218D-4166-8239-40169E1A121C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D38D6E40-218D-4166-8239-40169E1A121C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A99E2B60-ADE4-436F-BE09-F9407F61F3D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A99E2B60-ADE4-436F-BE09-F9407F61F3D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A99E2B60-ADE4-436F-BE09-F9407F61F3D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A99E2B60-ADE4-436F-BE09-F9407F61F3D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52AF1179-D916-4EC9-ADF7-D52129E697A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52AF1179-D916-4EC9-ADF7-D52129E697A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52AF1179-D916-4EC9-ADF7-D52129E697A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52AF1179-D916-4EC9-ADF7-D52129E697A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCC23C01-00A5-4093-8FE6-C928533C17AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCC23C01-00A5-4093-8FE6-C928533C17AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCC23C01-00A5-4093-8FE6-C928533C17AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCC23C01-00A5-4093-8FE6-C928533C17AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

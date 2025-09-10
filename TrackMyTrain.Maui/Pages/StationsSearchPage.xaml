@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pages:BaseContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TrackMyTrain.Maui.Pages.StationsSearchPage"
+             xmlns:pages="clr-namespace:TrackMyTrain.Maui.Pages"
+             xmlns:controls="clr-namespace:TrackMyTrain.Maui.Pages.Controls"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:vm="clr-namespace:TrackMyTrain.Maui.ViewModels"
+             x:TypeArguments="vm:StationsSearchViewModel">
+    <ScrollView>
+        <Grid RowDefinitions="Auto, *">
+
+            <!-- Search bar -->
+            <StackLayout Padding="8" Spacing="0">
+                <!-- Train Card 1 - RV 11528 with 1 minute delay -->
+                <Frame BackgroundColor="White" 
+                   CornerRadius="8" 
+                   HasShadow="True"
+                   Padding="0"
+                   Margin="0,0,0,8">
+                    <StackLayout Spacing="0">
+
+                        <!-- Main train info section -->
+                        <Grid Padding="8,8,8,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Train Type and Number -->
+                            <StackLayout Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" VerticalOptions="Center">
+                                <Label Text="RV" 
+                               FontSize="20" 
+                               FontAttributes="Bold" 
+                               TextColor="#666666" />
+                                <Label Text="11528" 
+                               FontSize="14" 
+                               TextColor="#999999" 
+                               Margin="0,-8,0,0" />
+                            </StackLayout>
+
+                            <!-- Times -->
+                            <StackLayout Grid.Column="1" Grid.Row="0" Orientation="Horizontal" HorizontalOptions="Center" VerticalOptions="Center">
+                                <Label Text="08:28" 
+                               FontSize="23" 
+                               FontAttributes="Bold" 
+                               TextColor="#333333" />
+                                <Label Text="→" 
+                               FontSize="25" 
+                               TextColor="#333333" 
+                               Margin="12,0" 
+                               VerticalOptions="Center" />
+                                <Label Text="09:14" 
+                               FontSize="23" 
+                               FontAttributes="Bold" 
+                               TextColor="#333333" />
+                            </StackLayout>
+
+                            <!-- Delay indicator -->
+                            <Label Grid.Column="2" Grid.Row="0" 
+                           Text="1'" 
+                           FontSize="20" 
+                           FontAttributes="Bold" 
+                           TextColor="#FF6B6B" 
+                           VerticalOptions="Center" />
+
+                            <!-- Actual times (delayed) -->
+                            <StackLayout Grid.Column="1" Grid.Row="1" Orientation="Horizontal" HorizontalOptions="Center" Margin="0,0,0,0">
+                                <Label Text="08:29" 
+                               FontSize="14" HorizontalTextAlignment="Center"
+                               TextColor="#FF6B6B" />
+                                <Label Text="09:15" 
+                               FontSize="14"  HorizontalTextAlignment="Center"
+                               TextColor="#FF6B6B" 
+                               Margin="60,0,0,0" />
+                            </StackLayout>
+                        </Grid>
+
+                        <!-- Bottom info bar -->
+                        <Grid BackgroundColor="{StaticResource BrandColor}" Padding="8,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Duration and stops info -->
+                            <!--<StackLayout Grid.Column="0" Orientation="Horizontal" Spacing="16" VerticalOptions="Center">-->
+                                <StackLayout Grid.Column="0" Orientation="Horizontal" Spacing="16" VerticalOptions="Center">
+                                    <Label Text="⏱" FontSize="16" TextColor="White" VerticalOptions="Center"/>
+                                    <Label Text="00:46" 
+                                   FontSize="14" 
+                                   TextColor="White" 
+                                   FontAttributes="Bold" 
+                                   VerticalOptions="Center"/>
+                                </StackLayout>
+
+                                <!--<StackLayout Orientation="Horizontal" Spacing="6">
+                                    <Label Text="🚉" FontSize="16" TextColor="White" VerticalOptions="Center"/>
+                                    <Label Text="3" 
+                                   FontSize="14" 
+                                   TextColor="White" 
+                                   FontAttributes="Bold" 
+                                   VerticalOptions="Center"/>
+                                </StackLayout>-->
+                            <!--</StackLayout>-->
+
+                            <StackLayout Orientation="Horizontal" Spacing="6" Grid.Column="1" >
+                                <Label Text="🚉" FontSize="16" TextColor="White" VerticalOptions="Center"/>
+                                <Label Text="3" 
+                                        FontSize="14" 
+                                        TextColor="White" 
+                                        FontAttributes="Bold" 
+                                        VerticalOptions="Center"/>
+                            </StackLayout>
+
+                            <!-- Notification button --><!--
+                            <Button Grid.Column="1" 
+                            Text="🔔 Notifica" 
+                            BackgroundColor="#2B6CB0" 
+                            TextColor="White" 
+                            FontSize="14"
+                            CornerRadius="8"
+                            Padding="16,8"
+                            BorderWidth="0"/>-->
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
+                <Frame BackgroundColor="White" 
+   CornerRadius="8" 
+   HasShadow="True"
+   Padding="0"
+   Margin="0,0,0,8">
+                    <StackLayout Spacing="0">
+
+                        <!-- Main train info section -->
+                        <Grid Padding="8,8,8,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Train Type and Number -->
+                            <StackLayout Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" VerticalOptions="Center">
+                                <Label Text="RV" 
+               FontSize="20" 
+               FontAttributes="Bold" 
+               TextColor="#666666" />
+                                <Label Text="11528" 
+               FontSize="14" 
+               TextColor="#999999" 
+               Margin="0,-8,0,0" />
+                            </StackLayout>
+
+                            <!-- Times -->
+                            <StackLayout Grid.Column="1" Grid.Row="0" Orientation="Horizontal" HorizontalOptions="Center" VerticalOptions="Center">
+                                <Label Text="08:28" 
+               FontSize="23" 
+               FontAttributes="Bold" 
+               TextColor="#333333" />
+                                <Label Text="→" 
+               FontSize="25" 
+               TextColor="#333333" 
+               Margin="12,0" 
+               VerticalOptions="Center" />
+                                <Label Text="09:14" 
+               FontSize="23" 
+               FontAttributes="Bold" 
+               TextColor="#333333" />
+                            </StackLayout>
+
+                            <!-- Delay indicator -->
+                            <Label Grid.Column="2" Grid.Row="0" 
+           Text="1'" 
+           FontSize="20" 
+           FontAttributes="Bold" 
+           TextColor="#FF6B6B" 
+           VerticalOptions="Center" />
+
+                            <!-- Actual times (delayed) -->
+                            <StackLayout Grid.Column="1" Grid.Row="1" Orientation="Horizontal" HorizontalOptions="Center" Margin="0,0,0,0">
+                                <Label Text="08:29" 
+               FontSize="14" HorizontalTextAlignment="Center"
+               TextColor="#FF6B6B" />
+                                <Label Text="09:15" 
+               FontSize="14"  HorizontalTextAlignment="Center"
+               TextColor="#FF6B6B" 
+               Margin="60,0,0,0" />
+                            </StackLayout>
+                        </Grid>
+
+                        <!-- Bottom info bar -->
+                        <Grid BackgroundColor="{StaticResource BrandColor}" Padding="8,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Duration and stops info -->
+                            <!--<StackLayout Grid.Column="0" Orientation="Horizontal" Spacing="16" VerticalOptions="Center">-->
+                            <StackLayout Grid.Column="0" Orientation="Horizontal" Spacing="16" VerticalOptions="Center">
+                                <Label Text="⏱" FontSize="16" TextColor="White" VerticalOptions="Center"/>
+                                <Label Text="00:46" 
+                   FontSize="14" 
+                   TextColor="White" 
+                   FontAttributes="Bold" 
+                   VerticalOptions="Center"/>
+                            </StackLayout>
+
+                            <!--<StackLayout Orientation="Horizontal" Spacing="6">
+                    <Label Text="🚉" FontSize="16" TextColor="White" VerticalOptions="Center"/>
+                    <Label Text="3" 
+                   FontSize="14" 
+                   TextColor="White" 
+                   FontAttributes="Bold" 
+                   VerticalOptions="Center"/>
+                </StackLayout>-->
+                            <!--</StackLayout>-->
+
+                            <StackLayout Orientation="Horizontal" Spacing="6" Grid.Column="1" >
+                                <Label Text="🚉" FontSize="16" TextColor="White" VerticalOptions="Center"/>
+                                <Label Text="3" 
+                        FontSize="14" 
+                        TextColor="White" 
+                        FontAttributes="Bold" 
+                        VerticalOptions="Center"/>
+                            </StackLayout>
+
+                            <!-- Notification button -->
+                            <!--
+            <Button Grid.Column="1" 
+            Text="🔔 Notifica" 
+            BackgroundColor="#2B6CB0" 
+            TextColor="White" 
+            FontSize="14"
+            CornerRadius="8"
+            Padding="16,8"
+            BorderWidth="0"/>-->
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
+
+                <Frame BackgroundColor="White" 
+   CornerRadius="8" 
+   HasShadow="True"
+   Padding="0"
+   Margin="0,0,0,8">
+                    <StackLayout Spacing="0">
+
+                        <!-- Main train info section -->
+                        <Grid Padding="8,8,8,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Train Type and Number -->
+                            <StackLayout Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" VerticalOptions="Center">
+                                <Label Text="RV" 
+               FontSize="20" 
+               FontAttributes="Bold" 
+               TextColor="#666666" />
+                                <Label Text="11528" 
+               FontSize="14" 
+               TextColor="#999999" 
+               Margin="0,-8,0,0" />
+                            </StackLayout>
+
+                            <!-- Times -->
+                            <StackLayout Grid.Column="1" Grid.Row="0" Orientation="Horizontal" HorizontalOptions="Center" VerticalOptions="Center">
+                                <Label Text="08:28" 
+               FontSize="23" 
+               FontAttributes="Bold" 
+               TextColor="#333333" />
+                                <Label Text="→" 
+               FontSize="25" 
+               TextColor="#333333" 
+               Margin="12,0" 
+               VerticalOptions="Center" />
+                                <Label Text="09:14" 
+               FontSize="23" 
+               FontAttributes="Bold" 
+               TextColor="#333333" />
+                            </StackLayout>
+
+                            <!-- Delay indicator -->
+                            <Label Grid.Column="2" Grid.Row="0" 
+           Text="1'" 
+           FontSize="20" 
+           FontAttributes="Bold" 
+           TextColor="#FF6B6B" 
+           VerticalOptions="Center" />
+
+                            <!-- Actual times (delayed) -->
+                            <StackLayout Grid.Column="1" Grid.Row="1" Orientation="Horizontal" HorizontalOptions="Center" Margin="0,0,0,0">
+                                <Label Text="08:29" 
+               FontSize="14" HorizontalTextAlignment="Center"
+               TextColor="#FF6B6B" />
+                                <Label Text="09:15" 
+               FontSize="14"  HorizontalTextAlignment="Center"
+               TextColor="#FF6B6B" 
+               Margin="60,0,0,0" />
+                            </StackLayout>
+                        </Grid>
+
+                        <!-- Bottom info bar -->
+                        <Grid BackgroundColor="{StaticResource BrandColor}" Padding="8,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Duration and stops info -->
+                            <!--<StackLayout Grid.Column="0" Orientation="Horizontal" Spacing="16" VerticalOptions="Center">-->
+                            <StackLayout Grid.Column="0" Orientation="Horizontal" Spacing="16" VerticalOptions="Center">
+                                <Label Text="⏱" FontSize="16" TextColor="White" VerticalOptions="Center"/>
+                                <Label Text="00:46" 
+                   FontSize="14" 
+                   TextColor="White" 
+                   FontAttributes="Bold" 
+                   VerticalOptions="Center"/>
+                            </StackLayout>
+
+                            <!--<StackLayout Orientation="Horizontal" Spacing="6">
+                    <Label Text="🚉" FontSize="16" TextColor="White" VerticalOptions="Center"/>
+                    <Label Text="3" 
+                   FontSize="14" 
+                   TextColor="White" 
+                   FontAttributes="Bold" 
+                   VerticalOptions="Center"/>
+                </StackLayout>-->
+                            <!--</StackLayout>-->
+
+                            <StackLayout Orientation="Horizontal" Spacing="6" Grid.Column="1" >
+                                <Label Text="🚉" FontSize="16" TextColor="White" VerticalOptions="Center"/>
+                                <Label Text="3" 
+                        FontSize="14" 
+                        TextColor="White" 
+                        FontAttributes="Bold" 
+                        VerticalOptions="Center"/>
+                            </StackLayout>
+
+                            <!-- Notification button -->
+                            <!--
+            <Button Grid.Column="1" 
+            Text="🔔 Notifica" 
+            BackgroundColor="#2B6CB0" 
+            TextColor="White" 
+            FontSize="14"
+            CornerRadius="8"
+            Padding="16,8"
+            BorderWidth="0"/>-->
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
+            </StackLayout>
+        </Grid>
+    </ScrollView>
+</pages:BaseContentPage>

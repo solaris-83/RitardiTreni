@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<pages:BaseContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:pages="clr-namespace:TrackMyTrain.Maui.Pages"
+             xmlns:vm="clr-namespace:TrackMyTrain.Maui.ViewModels"
+             x:TypeArguments="vm:BaseViewModel"
+             x:Class="TrackMyTrain.Maui.Pages.TrainDetailPage">
+
+    <!--<ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+            <Image
+                Source="dotnet_bot.png"
+                HeightRequest="185"
+                Aspect="AspectFit"
+                SemanticProperties.Description="dot net bot in a hovercraft number nine" />
+
+            <Label
+                Text="Hello, World!"
+                Style="{StaticResource Headline}"
+                SemanticProperties.HeadingLevel="Level1" />
+
+            <Label
+                Text="Welcome to &#10;.NET Multi-platform App UI"
+                Style="{StaticResource SubHeadline}"
+                SemanticProperties.HeadingLevel="Level2"
+                SemanticProperties.Description="Welcome to dot net Multi platform App U I" />
+
+            <Button
+                x:Name="CounterBtn"
+                Text="Click me" 
+                SemanticProperties.Hint="Counts the number of times you click"
+                Clicked="OnCounterClicked"
+                HorizontalOptions="Fill" />
+        </VerticalStackLayout>
+    </ScrollView>-->
+    <ScrollView>
+        <StackLayout Padding="10" Spacing="0">
+
+            <!-- Header Section -->
+            <Frame CornerRadius="8"
+                   Padding="12"
+                   HasShadow="True"
+                   Margin="3,0,3,10"
+                   BackgroundColor="#fffdf8">
+                <Grid  RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto" Margin="0,0,0,0">
+                    <StackLayout Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                        <Label Text="TI REG 2004" FontSize="18" FontAttributes="Bold" TextColor="#333"/>
+                        <Label Text="🚲" FontSize="16"/>
+                        <Label Text="♿" FontSize="16"/>
+                    </StackLayout>
+
+                    <Button Grid.Row="0" Grid.Column="1" Text="✕" BackgroundColor="Transparent"
+                        TextColor="#666" FontSize="18" Padding="8"/>
+
+                    <StackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
+                            Spacing="8" Margin="0,8,0,0">
+                        <Ellipse Fill="#666" WidthRequest="8" HeightRequest="8" VerticalOptions="Center"/>
+                        <Label Text="17:10 Milano Porta Garibaldi" FontSize="16" TextColor="#333"/>
+                    </StackLayout>
+
+                    <StackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
+                            Spacing="8" Margin="0,4,0,0">
+                        <Ellipse Fill="Transparent" Stroke="#666" StrokeThickness="2" WidthRequest="8"
+                            HeightRequest="8" VerticalOptions="Center"/>
+                        <Label Text="18:50 Torino Porta Nuova" FontSize="16" TextColor="#333"/>
+                    </StackLayout>
+
+                    <Button Grid.Row="2" Grid.Column="1" Text="⭐" BackgroundColor="Transparent"
+                        TextColor="Gold" FontSize="23"/>
+
+                    <StackLayout Grid.Row="3" Grid.Column="0" Orientation="Horizontal" Spacing="8"
+                            Margin="0,12,0,0">
+                        <Label Text="⏰" FontSize="14" TextColor="#666"/>
+                        <Label Text="arrived 1 min late" FontSize="14" TextColor="#FF5722"/>
+                    </StackLayout>
+
+                    <Label Grid.Row="4" Text="18:50 Torino Porta Nuova" FontSize="14" TextColor="#333"/>
+                    <!--<Button Grid.Row="3" Grid.Column="1" Text="?" BackgroundColor="Transparent"
+                        BorderColor="#4CAF50" BorderWidth="2" TextColor="#4CAF50"
+                        CornerRadius="15" WidthRequest="30" HeightRequest="30"/>-->
+                </Grid>
+            </Frame>
+
+            <!-- Stops Header -->
+                <Grid ColumnDefinitions="*,Auto" Margin="3,0,0,15">
+                    <Label Grid.Column="0" Text="Stops" FontSize="16" FontAttributes="Bold" TextColor="#666"/>
+                    <Label Grid.Column="1" Text="Platform" FontSize="16" FontAttributes="Bold" TextColor="#666"/>
+                </Grid>
+
+                <!-- Train Stops List -->
+                <StackLayout Spacing="0">
+
+                    <!-- Milano Porta Garibaldi -->
+                <Frame CornerRadius="0"
+                   Padding="6"
+                   HasShadow="True"
+                   Margin="3,0,3,0"
+                   BackgroundColor="#fffdf8">
+                    <Grid BackgroundColor="#fffdf8" ColumnDefinitions="32,*,Auto" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,0">
+                        <Ellipse Grid.Row="0" Grid.Column="0" Fill="#1976D2" WidthRequest="12" HeightRequest="12"
+                            HorizontalOptions="Center" VerticalOptions="Start" Margin="0,8,0,0"/>
+                        <BoxView Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Color="#1976D2"
+                            WidthRequest="2" HorizontalOptions="Center" Margin="0,4,0,0"/>
+
+                        <StackLayout Grid.Row="0" Grid.Column="1" Spacing="4" Margin="8,0,0,0">
+                            <Label Text="Milano Porta Garibaldi" FontSize="16" FontAttributes="Bold" TextColor="#333"/>
+                            <StackLayout Orientation="Horizontal" Spacing="16">
+                                <Label Text="Arrival" FontSize="14" TextColor="#666"/>
+                                <Label Text="- - : - -" FontSize="14" TextColor="#666"/>
+                            </StackLayout>
+                            <StackLayout Orientation="Horizontal" Spacing="16">
+                                <Label Text="Departure" FontSize="14" TextColor="#666"/>
+                                <Label Text="17:10" FontSize="14" TextColor="#333"/>
+                                <Label Text="17:11" FontSize="14" TextColor="#4CAF50"/>
+                            </StackLayout>
+                        </StackLayout>
+
+                        <Label Grid.Row="0" Grid.Column="2" Text="3" FontSize="16" FontAttributes="Bold"
+                          TextColor="#1976D2" BackgroundColor="#E3F2FD" WidthRequest="32" HeightRequest="32"
+                          HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+                          HorizontalOptions="Center" VerticalOptions="Start"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Rho Fiera Milano -->
+                <Frame CornerRadius="8"
+                   Padding="6"
+                   HasShadow="True"
+                   Margin="3,0,3,3"
+                   BackgroundColor="#fffdf8">
+                    <Grid BackgroundColor="#fffdf8" ColumnDefinitions="32,*,Auto" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,0">
+                        <Ellipse Grid.Row="0" Grid.Column="0" Fill="#1976D2" WidthRequest="12" HeightRequest="12"
+                            HorizontalOptions="Center" VerticalOptions="Start" Margin="0,8,0,0"/>
+                        <BoxView Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Color="#1976D2"
+                            WidthRequest="2" HorizontalOptions="Center" Margin="0,4,0,0"/>
+
+                        <StackLayout Grid.Row="0" Grid.Column="1" Spacing="4" Margin="8,0,0,0">
+                            <Label Text="Rho Fiera Milano" FontSize="16" FontAttributes="Bold" TextColor="#333"/>
+                            <StackLayout Orientation="Horizontal" Spacing="16">
+                                <Label Text="Arrival" FontSize="14" TextColor="#666"/>
+                                <Label Text="17:23" FontSize="14" TextColor="#333"/>
+                                <Label Text="17:19" FontSize="14" TextColor="#4CAF50"/>
+                            </StackLayout>
+                            <StackLayout Orientation="Horizontal" Spacing="16">
+                                <Label Text="Departure" FontSize="14" TextColor="#666"/>
+                                <Label Text="17:24" FontSize="14" TextColor="#333"/>
+                                <Label Text="17:25" FontSize="14" TextColor="#4CAF50"/>
+                            </StackLayout>
+                        </StackLayout>
+
+                        <Label Grid.Row="0" Grid.Column="2" Text="3" FontSize="16" FontAttributes="Bold"
+                          TextColor="#1976D2" BackgroundColor="#E3F2FD" WidthRequest="32" HeightRequest="32"
+                          HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+                          HorizontalOptions="Center" VerticalOptions="Start"/>
+                    </Grid>
+                </Frame>
+                <!-- Novara -->
+                <Frame CornerRadius="8"
+                   Padding="6"
+                   HasShadow="True"
+                   Margin="3,0,3,3"
+                   BackgroundColor="#fffdf8">
+                    <Grid BackgroundColor="#fffdf8" ColumnDefinitions="32,*,Auto" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,0">
+                        <Ellipse Grid.Row="0" Grid.Column="0" Fill="#1976D2" WidthRequest="12" HeightRequest="12"
+                            HorizontalOptions="Center" VerticalOptions="Start" Margin="0,8,0,0"/>
+                        <BoxView Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Color="#1976D2"
+                            WidthRequest="2" HorizontalOptions="Center" Margin="0,4,0,0"/>
+
+                        <StackLayout Grid.Row="0" Grid.Column="1" Spacing="4" Margin="8,0,0,0">
+                            <Label Text="Novara" FontSize="16" FontAttributes="Bold" TextColor="#333"/>
+                            <StackLayout Orientation="Horizontal" Spacing="16">
+                                <Label Text="Arrival" FontSize="14" TextColor="#666"/>
+                                <Label Text="17:46" FontSize="14" TextColor="#333"/>
+                                <Label Text="17:43" FontSize="14" TextColor="#4CAF50"/>
+                            </StackLayout>
+                            <StackLayout Orientation="Horizontal" Spacing="16">
+                                <Label Text="Departure" FontSize="14" TextColor="#666"/>
+                                <Label Text="17:47" FontSize="14" TextColor="#333"/>
+                                <Label Text="17:48" FontSize="14" TextColor="#4CAF50"/>
+                            </StackLayout>
+                        </StackLayout>
+
+                        <Label Grid.Row="0" Grid.Column="2" Text="3" FontSize="16" FontAttributes="Bold"
+                          TextColor="#1976D2" BackgroundColor="#E3F2FD" WidthRequest="32" HeightRequest="32"
+                          HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+                          HorizontalOptions="Center" VerticalOptions="Start"/>
+                    </Grid>
+                </Frame>
+                <!-- Vercelli -->
+                <Frame CornerRadius="8"
+                   Padding="6"
+                   HasShadow="True"
+                   Margin="3,0,3,3"
+                   BackgroundColor="#fffdf8">
+                    <Grid ColumnDefinitions="32,*,Auto" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,0">
+                        <Ellipse Grid.Row="0" Grid.Column="0" Fill="#1976D2" WidthRequest="12" HeightRequest="12"
+                            HorizontalOptions="Center" VerticalOptions="Start" Margin="0,8,0,0"/>
+                        <BoxView Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Color="#1976D2"
+                            WidthRequest="2" HorizontalOptions="Center" Margin="0,4,0,0"/>
+
+                        <StackLayout Grid.Row="0" Grid.Column="1" Spacing="4" Margin="8,0,0,0">
+                            <Label Text="Vercelli" FontSize="16" FontAttributes="Bold" TextColor="#333"/>
+                            <StackLayout Orientation="Horizontal" Spacing="16">
+                                <Label Text="Arrival" FontSize="14" TextColor="#666"/>
+                                <Label Text="17:59" FontSize="14" TextColor="#333"/>
+                                <Label Text="17:57" FontSize="14" TextColor="#4CAF50"/>
+                            </StackLayout>
+                            <StackLayout Orientation="Horizontal" Spacing="16">
+                                <Label Text="Departure" FontSize="14" TextColor="#666"/>
+                                <Label Text="18:00" FontSize="14" TextColor="#333"/>
+                                <Label Text="18:01" FontSize="14" TextColor="#4CAF50"/>
+                            </StackLayout>
+                        </StackLayout>
+
+                        <Label Grid.Row="0" Grid.Column="2" Text="2" FontSize="16" FontAttributes="Bold"
+                          TextColor="#1976D2" BackgroundColor="#E3F2FD" WidthRequest="32" HeightRequest="32"
+                          HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+                          HorizontalOptions="Center" VerticalOptions="Start"/>
+                    </Grid>
+                </Frame>
+                <!-- Torino Porta Susa -->
+                <Frame CornerRadius="8"
+                   Padding="6"
+                   HasShadow="True"
+                   Margin="3,0,3,3"
+                   BackgroundColor="#fffdf8">
+                    <Grid ColumnDefinitions="32,*,Auto" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,0">
+                        <Ellipse Grid.Row="0" Grid.Column="0" Fill="#1976D2" WidthRequest="12" HeightRequest="12"
+                            HorizontalOptions="Center" VerticalOptions="Start" Margin="0,8,0,0"/>
+                        <BoxView Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Color="#1976D2"
+                            WidthRequest="2" HorizontalOptions="Center" Margin="0,4,0,0"/>
+
+                        <StackLayout Grid.Row="0" Grid.Column="1" Spacing="4" Margin="8,0,0,0">
+                            <Label Text="Torino Porta Susa" FontSize="16" FontAttributes="Bold" TextColor="#333"/>
+                            <StackLayout Orientation="Horizontal" Spacing="16">
+                                <Label Text="Arrival" FontSize="14" TextColor="#666"/>
+                                <Label Text="18:38" FontSize="14" TextColor="#333"/>
+                                <Label Text="18:35" FontSize="14" TextColor="#4CAF50"/>
+                            </StackLayout>
+                            <StackLayout Orientation="Horizontal" Spacing="16">
+                                <Label Text="Departure" FontSize="14" TextColor="#666"/>
+                                <Label Text="18:40" FontSize="14" TextColor="#333"/>
+                                <Label Text="18:41" FontSize="14" TextColor="#4CAF50"/>
+                            </StackLayout>
+                        </StackLayout>
+
+                        <Label Grid.Row="0" Grid.Column="2" Text="1" FontSize="16" FontAttributes="Bold"
+                          TextColor="#1976D2" BackgroundColor="#E3F2FD" WidthRequest="32" HeightRequest="32"
+                          HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+                          HorizontalOptions="Center" VerticalOptions="Start"/>
+                    </Grid>
+                </Frame>
+                <!-- Torino Porta Nuova -->
+                <Frame CornerRadius="8"
+                   Padding="6"
+                   HasShadow="True"
+                   Margin="3,0,3,3"
+                   BackgroundColor="#fffdf8">   
+                    <Grid ColumnDefinitions="32,*,Auto" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,0">
+                        <Ellipse Grid.Row="0" Grid.Column="0" Fill="#1976D2" WidthRequest="12" HeightRequest="12"
+                            HorizontalOptions="Center" VerticalOptions="Start" Margin="0,8,0,0"/>
+
+                        <StackLayout Grid.Row="0" Grid.Column="1" Spacing="4" Margin="8,0,0,0">
+                            <Label Text="Torino Porta Nuova" FontSize="16" FontAttributes="Bold" TextColor="#333"/>
+                            <StackLayout Orientation="Horizontal" Spacing="16">
+                                <Label Text="Arrival" FontSize="14" TextColor="#666"/>
+                                <Label Text="18:50" FontSize="14" TextColor="#333"/>
+                                <Label Text="18:50" FontSize="14" TextColor="#4CAF50"/>
+                            </StackLayout>
+                            <StackLayout Orientation="Horizontal" Spacing="16">
+                                <Label Text="Departure" FontSize="14" TextColor="#666"/>
+                                <Label Text="- - : - -" FontSize="14" TextColor="#666"/>
+                            </StackLayout>
+                        </StackLayout>
+
+                        <Label Grid.Row="0" Grid.Column="2" Text="2" FontSize="16" FontAttributes="Bold"
+                          TextColor="#1976D2" BackgroundColor="#E3F2FD" WidthRequest="32" HeightRequest="32"
+                          HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+                          HorizontalOptions="Center" VerticalOptions="Start"/>
+                    </Grid>
+                </Frame>
+            </StackLayout>
+
+            </StackLayout>
+        </ScrollView>
+
+</pages:BaseContentPage>
