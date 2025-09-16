@@ -43,6 +43,12 @@ namespace TrackMyTrain.Maui.ViewModels
             await Shell.Current.GoToAsync("traindetails");
         }
 
+        [RelayCommand]
+        private void ClearCurrentTrainValue()
+        {
+            CurrentTrain = string.Empty;
+        }
+
         private async Task LoadDataAsync()
         {
             try
@@ -52,19 +58,23 @@ namespace TrackMyTrain.Maui.ViewModels
 
                 // Recupero i dati necessari dell'andamento del treno e li preparo per mostrarli
                 if (results.Any())
-                    RecentTrains.Clear();
-
-                foreach (var train in results)
                 {
-                    List<TrainAutocomplete> stationTrains = await _httpDataService.GetTrainsByNumberAsync(train.Number);
-                    TrainAutocomplete autocompleteTrain = stationTrains.SingleOrDefault(tr => tr.TrainNumber == train.Number && tr.DepartureStationShortCode == train.DepartureStationShortCode);
-                    if (autocompleteTrain == null)
+                    var itemsToLoad = new List<RecentTrain>();
+
+                    foreach (var train in results)
                     {
-                        throw new Exception($"Couldn't find a train matching with number {train.Number} and departure station code {train.DepartureStationShortCode}");
+                        List<TrainAutocomplete> stationTrains = await _httpDataService.GetTrainsByNumberAsync(train.Number);
+                        TrainAutocomplete autocompleteTrain = stationTrains.SingleOrDefault(tr => tr.TrainNumber == train.Number && tr.DepartureStationShortCode == train.DepartureStationShortCode);
+                        if (autocompleteTrain == null)
+                        {
+                            throw new Exception($"Couldn't find a train matching with number {train.Number} and departure station code {train.DepartureStationShortCode}");
+                        }
+
+                        TrainJourney trainJourney = await _httpDataService.GetTrainJourneyAsync(autocompleteTrain);
+                        itemsToLoad.Add(new RecentTrain(autocompleteTrain.TrainNumber, autocompleteTrain.DepartureStationName, train.ArrivalStationName, trainJourney.CompOrarioPartenza, trainJourney.CompOrarioArrivo, trainJourney.Ritardo ?? 0, trainJourney.HasWarning()));
                     }
 
-                    TrainJourney trainJourney = await _httpDataService.GetTrainJourneyAsync(autocompleteTrain);
-                    RecentTrains.Add(new RecentTrain(autocompleteTrain.TrainNumber, autocompleteTrain.DepartureStationName, train.ArrivalStationName, trainJourney.CompOrarioPartenza, trainJourney.CompOrarioArrivo, trainJourney.Ritardo ?? 0, trainJourney.HasWarning()));
+                    RecentTrains = new ObservableCollection<RecentTrain>(itemsToLoad);
                 }
             }
             catch (Exception ex)
@@ -82,6 +92,8 @@ namespace TrackMyTrain.Maui.ViewModels
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(CurrentTrain))
+                    return;
                 TrainAutocomplete autocompleteTrain = default;
                 List<TrainAutocomplete> stationTrains = await _httpDataService.GetTrainsByNumberAsync(CurrentTrain);
 
@@ -124,7 +136,9 @@ namespace TrackMyTrain.Maui.ViewModels
 
                     await _dbService.AddItemAsync(trainToAdd);
                 }
-                RecentTrains.Add(new RecentTrain(autocompleteTrain.TrainNumber, autocompleteTrain.DepartureStationName, trainJourney.Destinazione, trainJourney.CompOrarioPartenza, trainJourney.CompOrarioArrivo, trainJourney.Ritardo ?? 0, trainJourney.HasWarning()));       
+                // Lo aggiungo alla CollectionView solo se non già presente
+                if (!RecentTrains.Any(rec => rec.Number == autocompleteTrain.TrainNumber && rec.DepartureStationName == autocompleteTrain.DepartureStationName))
+                    RecentTrains.Insert(0, new RecentTrain(autocompleteTrain.TrainNumber, autocompleteTrain.DepartureStationName, trainJourney.Destinazione, trainJourney.CompOrarioPartenza, trainJourney.CompOrarioArrivo, trainJourney.Ritardo ?? 0, trainJourney.HasWarning()));       
             }
             catch (Exception ex)
             {

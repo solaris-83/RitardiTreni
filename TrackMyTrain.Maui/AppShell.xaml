@@ -8,19 +8,28 @@
     Title="TrackMyTrain.Maui">
 
     <TabBar>
-        <Tab Title="Stazioni" Icon="tab_schedule.png">
+        <Tab Title="Stazioni">
+            <Tab.Icon>
+                <FontImageSource FontFamily="FaSolid" Size="24" Glyph="{StaticResource search}"/>
+            </Tab.Icon>
             <ShellContent
-             Title="Stazioni"
+             Title="Ricerca"
              ContentTemplate="{DataTemplate local:StationsSearchPage}"
              Route="Stations" />
         </Tab>
-        <Tab Title="Treni" Icon="tab_speakers.png">
+        <Tab Title="Treni">
+            <Tab.Icon>
+                <FontImageSource FontFamily="FaSolid" Size="24" Glyph="{StaticResource train}"/>
+            </Tab.Icon>
             <ShellContent
              Title="Treni"
              ContentTemplate="{DataTemplate local:TrainsSearchPage}"
              Route="Trains" />
         </Tab>
-        <Tab Title="Preferiti" Icon="tab_myagenda.png">
+        <Tab Title="Preferiti">
+            <Tab.Icon>
+                <FontImageSource FontFamily="FaSolid" Size="24" Glyph="{StaticResource star}"/>
+            </Tab.Icon>
             <ShellContent
              Title="Preferiti"
              ContentTemplate="{DataTemplate local:TrainDetailPage}"

@@ -4,8 +4,6 @@
 #endif
 using TrackMyTrain.Data.Implementations;
 using TrackMyTrain.Data.Interfaces;
-using TrackMyTrain.Maui.Pages;
-using TrackMyTrain.Maui.Services;
 
 namespace TrackMyTrain.Maui
 {

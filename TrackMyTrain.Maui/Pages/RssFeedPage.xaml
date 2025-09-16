@@ -8,81 +8,100 @@
              xmlns:vm="clr-namespace:TrackMyTrain.Maui.ViewModels"
              x:TypeArguments="vm:RssFeedViewModel">
     <ContentPage.Resources>
-        <ResourceDictionary>
-            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
-            <toolkit:IsEqualConverter x:Key="IsEqualConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
-    <Grid RowDefinitions="Auto, *">
-        <Border 
-            Padding="0"
-            WidthRequest="{OnIdiom Desktop=300, Default=Auto}"
-            HorizontalOptions="Start"
-            Margin="10">
-            <Picker Margin="10" ItemsSource="{Binding Categories}"  SelectedItem="{Binding SelectedCategory}" FontSize="13" BackgroundColor="Transparent" Title="Seleziona una categoria" />
-        </Border>
-        <RefreshView Grid.Row="1" Command="{Binding LoadDataCommand}" IsRefreshing="{Binding IsRefreshing}" RefreshColor="{StaticResource BrandColor}">
+        <Style x:Key="CommonLabelHeaderStyle" TargetType="Label">
+            <Setter Property="FontFamily" Value="OpenSans-Regular" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="TextColor" Value="{StaticResource Gray500}" />
+        </Style>
+        <DataTemplate x:Key="StrikesDataTemplate">
             <Grid>
-                <Border IsVisible="{Binding StrikesGrouped.Count, Converter={StaticResource IsEqualConverter}, ConverterParameter=0}" StrokeShape="RoundRectangle 8,8,8,8" VerticalOptions="Center" HorizontalOptions="Center" 
-                     WidthRequest="200" HeightRequest="20"
-                     BackgroundColor="White">
-                    <Label TextColor="{StaticResource Gray800}"  VerticalOptions="Center" HorizontalOptions="Center" FontSize="14" Text="Nessuno sciopero previsto" />
-                </Border>
+                <Border
+                    Stroke="#e0e0e0"
+                    Padding="8"
+                    StrokeThickness="1"
+                    Background="#fffdf8"
+                    StrokeShape="RoundRectangle 6">
+                    <Border.Shadow>
+                        <Shadow Brush="Black"
+                        Opacity="0.2"
+                        Radius="10"
+                        Offset="0,0" />
+                    </Border.Shadow>
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="8">
+                        <!-- Title -->
+                        <Label Grid.Row="0"
+                           Text="{Binding Title}"
+                           FontSize="13"
+                           FontAttributes="Bold"
+                           LineBreakMode="WordWrap"
+                           TextColor="{StaticResource Gray900}" />
 
-                <ScrollView >
-                    <CollectionView  Margin="10,0,10,10" ItemsSource="{Binding StrikesGrouped}"
-                        IsGrouped="True"
-                        SelectionMode="None">
-                        <CollectionView.EmptyView>
-                        <ContentView>
-                            <Frame CornerRadius="8" VerticalOptions="Center" HorizontalOptions="Center" 
-                                Padding="12" 
-                                HasShadow="True"
-                                WidthRequest="200" HeightRequest="60"
-                                BackgroundColor="White">
-                                <Label TextColor="{StaticResource Gray800}"  VerticalOptions="Center" HorizontalOptions="Center" FontSize="14" Text="Nessuno sciopero previsto" />
-                            </Frame>
-                        </ContentView>
-                    </CollectionView.EmptyView>
-                        <CollectionView.GroupHeaderTemplate>
-                            <DataTemplate>
-                                <Label Text="{Binding Date}"
-                                   FontSize="14"
-                                   Margin="5"
-                                   FontAttributes="Bold"
-                                   TextColor="{StaticResource Gray500}" />
-                            </DataTemplate>
-                        </CollectionView.GroupHeaderTemplate>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <VerticalStackLayout>
-                                    <Frame 
-                                           CornerRadius="6"
-                                           Padding="12"
-                                           Margin="0,0,8,3"
-                                           HasShadow="True"
-                                           BackgroundColor="#fffdf8">
-                                        <VerticalStackLayout Margin="0" Spacing="5">
-                                            <Label Text="{Binding Title}"
-                                               FontSize="14"
-                                               FontAttributes="Bold"
-                                               LineBreakMode="WordWrap"/>
-                                            <Label Text="{Binding Area}"
-                                                   FontSize="14"
-                                                   FontAttributes="Bold"/>
-                                            <Label Text="{Binding Hours}"
-                                                    FontSize="13"/>
-                                            <Label Text="{Binding Notes}"
-                                                   FontSize="13"/>
-                                        </VerticalStackLayout>
-                                    </Frame>
-                                </VerticalStackLayout>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </ScrollView>
+                        <!-- Area -->
+                        <Label Grid.Row="1"
+                           Text="{Binding Area}"
+                           FontSize="13"
+                           TextColor="{StaticResource Gray700}" />
+
+                        <!-- Hours -->
+                        <Label Grid.Row="2"
+                           Text="{Binding Hours}"
+                           FontSize="13"
+                           TextColor="{StaticResource Gray500}" />
+
+                        <!-- Notes -->
+                        <Label Grid.Row="3"
+                           Text="{Binding Notes}"
+                           FontSize="13"
+                           LineBreakMode="WordWrap"
+                           TextColor="{StaticResource Gray500}" />
+                    </Grid>
+                </Border>
             </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="GroupHeaderDataTemplate">
+            <Label Text="{Binding Date}"
+               Style="{StaticResource CommonLabelHeaderStyle}"
+               Padding="5"
+               VerticalOptions="Center" />
+        </DataTemplate>
+    </ContentPage.Resources>
+    <Grid RowDefinitions="Auto, *" 
+      Margin="8" 
+      RowSpacing="16">
+        <Border StrokeThickness="1" Margin="10" Padding="10,0" HorizontalOptions="Center" StrokeShape="RoundRectangle 4" Stroke="{StaticResource Gray400}" >
+            <StackLayout Spacing="20" Margin="10" Orientation="Horizontal" HorizontalOptions="Center">
+                <Label Style="{StaticResource CommonLabelHeaderStyle}"
+                    Text="Seleziona una categoria" VerticalOptions="Center"
+                    HorizontalOptions="Center" />
+                <Image Source="filter.png" WidthRequest="36" HeightRequest="36" BackgroundColor="Transparent" />
+                <StackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenPopupCommand}" />
+                </StackLayout.GestureRecognizers>
+            </StackLayout>
+        </Border>
+
+        <!-- Content Section with RefreshView and CollectionView -->
+        <RefreshView Grid.Row="1" 
+                 Command="{Binding LoadDataCommand}" 
+                 IsRefreshing="{Binding IsRefreshing}" 
+                 RefreshColor="{StaticResource BrandColor}"
+                 Margin="0,0,0,0">
+
+            <CollectionView ItemsSource="{Binding StrikesGrouped}"
+                        IsGrouped="True"
+                        VerticalScrollBarVisibility="Never"
+                        SelectionMode="None"
+                        GroupHeaderTemplate="{StaticResource GroupHeaderDataTemplate}"
+                        ItemTemplate="{StaticResource StrikesDataTemplate}"
+                        Margin="0">
+            </CollectionView>
         </RefreshView>
-        <controls:CustomActivityIndicator Grid.Row="1" IsVisible="{Binding LoadDataCommand.IsRunning}" />
+
+        <!-- Loading Indicator -->
+        <controls:CustomActivityIndicator Grid.RowSpan="2" 
+                                      IsVisible="{Binding LoadDataCommand.IsRunning}"
+                                      HorizontalOptions="Center"
+                                      VerticalOptions="Center" />
     </Grid>
 </pages:BaseContentPage>

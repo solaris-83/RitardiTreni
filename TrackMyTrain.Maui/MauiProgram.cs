@@ -2,7 +2,6 @@
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using SimpleFeedReader;
-using SkiaSharp.Views.Maui.Controls.Hosting;
 using TrackMyTrain.Data.Interfaces;
 using TrackMyTrain.Data.Services;
 using TrackMyTrain.Maui.Pages;
@@ -23,17 +22,18 @@ namespace TrackMyTrain.Maui
                 .UseMauiCommunityToolkit()
                 .ConfigureMauiHandlers(handlers =>
                 {
-                   
+
                 })
-                .UseSkiaSharp()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                    fonts.AddFont("FA-Regular-400.otf", "FaRegular");
+                    fonts.AddFont("FA-Solid-900.otf", "FaSolid");
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
             builder.Services.AddSingleton<LocalDbService>();
             builder.Services.AddSingleton<INotificationHandler, ModalNotificationHandler>();
@@ -41,7 +41,30 @@ namespace TrackMyTrain.Maui
             builder.Services.AddSingleton<IDataService, DataService>();
             builder.Services.AddSingleton<IApiClientService, ApiClientService>();
             builder.Services.AddSingleton<IHttpDataService, HttpDataService>();
-            builder.Services.AddFeedReader(() => new FeedReaderOptions() { ThrowOnError = true });
+            builder.Services.AddTransientPopup<CategoriesPopup, CategoriesPopupViewModel>();
+
+            var feedReaderHttpClient = new HttpClient(new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
+                {
+                    if (cert?.Issuer != null && cert.Issuer.Contains("CN=Sectigo"))
+                    {
+                        return true;
+                    }
+                    return sslPolicyErrors == System.Net.Security.SslPolicyErrors.None;
+                }
+            })
+            {
+                Timeout = TimeSpan.FromSeconds(5)
+            };
+
+            // Then pass it to AddFeedReader
+            builder.Services.AddFeedReader(() => new FeedReaderOptions()
+            {
+                ThrowOnError = true,
+                HttpClient = feedReaderHttpClient
+            });
+
             builder.Services.AddTransient<RssFeedPage, RssFeedViewModel>();
             builder.Services.AddTransient<StationsSearchPage, StationsSearchViewModel>();
             builder.Services.AddTransient<TrainsSearchPage, TrainsSearchViewModel>();
@@ -57,7 +80,15 @@ namespace TrackMyTrain.Maui
             // Ensure these namespaces are included at the top of the file
             {
 #if DEBUG
-                ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
+                ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => {
+                    {
+                        if (cert?.Issuer != null && cert.Issuer.Contains("CN=mkcert"))
+                        {
+                            return true;
+                        }
+                        return sslPolicyErrors == System.Net.Security.SslPolicyErrors.None;
+                    }
+                }
 #endif
             });
             return builder.Build();
