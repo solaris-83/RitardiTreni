@@ -39,6 +39,12 @@ namespace TrackMyTrain.Maui.Services
                 return await table.Where(predicate).ToListAsync();
             }
 
+            public async Task<TTable> GetFirstFilteredAsync<TTable>(Expression<Func<TTable, bool>> predicate) where TTable : TableBase, new()
+            {
+                var table = await GetTableAsync<TTable>();
+                return await table.FirstOrDefaultAsync(predicate);
+            }
+
             private async Task<TResult> Execute<TTable, TResult>(Func<Task<TResult>> action) where TTable : TableBase, new()
             {
                 await CreateTableIfNotExists<TTable>();
@@ -52,13 +58,17 @@ namespace TrackMyTrain.Maui.Services
                 return await Execute<TTable, TTable>(async () => await Database.GetAsync<TTable>(primaryKey));
             }
 
-            public async Task<bool> AddItemAsync<TTable>(TTable item) where TTable : TableBase, new()
+            public async Task<int> AddItemAsync<TTable>(TTable item) where TTable : TableBase, new()
             {
                 await CreateTableIfNotExists<TTable>();
                 //return await Database.InsertAsync(item) > 0;
                 item.CreatedAt = new DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds();
                 item.LastUpdatedAt = new DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds();
-                return await Execute<TTable, bool>(async () => await Database.InsertAsync(item) > 0);
+                return await Execute<TTable, int>(async () =>
+                {
+                    await Database.InsertAsync(item);
+                    return item.ID;
+                });
             }
 
             public async Task<bool> UpdateItemAsync<TTable>(TTable item) where TTable : TableBase, new()

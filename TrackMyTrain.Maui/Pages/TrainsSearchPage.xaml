@@ -5,123 +5,145 @@
              xmlns:pages="clr-namespace:TrackMyTrain.Maui.Pages"
              xmlns:controls="clr-namespace:TrackMyTrain.Maui.Pages.Controls"
              xmlns:conv="clr-namespace:TrackMyTrain.Maui.Utilities"
-             xmlns:model="clr-namespace:TrackMyTrain.Data.Implementations;assembly=TrackMyTrain.Data.Implementations"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:model="clr-namespace:TrackMyTrain.Maui.Models"
              xmlns:vm="clr-namespace:TrackMyTrain.Maui.ViewModels"
-             x:Name="this"
              x:DataType="vm:TrainsSearchViewModel"
              x:TypeArguments="vm:TrainsSearchViewModel">
     <ContentPage.Resources>
         <ResourceDictionary>
-            <!--<toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />-->
+            <x:Int32 x:Key="Threshold">0</x:Int32>
             <conv:TextTitleCaseConverter x:Key="TextTitleCaseConverter" />
+            <toolkit:BoolToObjectConverter x:Key="FavoriteImageConverter" 
+                                               TrueObject="Resources\Images\fullstar.png" 
+                                               FalseObject="Resources\Images\emptystart.png" />
+            <toolkit:CompareConverter x:Key="CompareConverter"
+                                  ComparisonOperator="Greater"
+                                  ComparingValue="{StaticResource Threshold}"
+                                  TrueObject="{StaticResource Red}"
+                                  FalseObject="{StaticResource Green}"/>
         </ResourceDictionary>
+        <Style x:Key="CommonEntryHeaderStyle" TargetType="Entry">
+            <Setter Property="FontFamily" Value="OpenSans-Regular" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="WidthRequest" Value="250" />
+            <Setter Property="TextColor" Value="{StaticResource Gray700}" />
+        </Style>
+        <DataTemplate x:Key="TrainDataTemplate" x:DataType="model:RecentTrain">
+            <Grid>
+                <Border
+                     Stroke="#e0e0e0"
+                     Padding="8"
+                     StrokeThickness="1"
+                     Background="#fffdf8"
+                     StrokeShape="RoundRectangle 6">
+                    <Border.Shadow>
+                        <Shadow Brush="Black"
+                             Opacity="0.2"
+                             Radius="10"
+                             Offset="0,0" />
+                    </Border.Shadow>
+                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto, *, Auto, Auto, 20" RowSpacing="8">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer NumberOfTapsRequired="2" Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:TrainsSearchViewModel}},Path=DeleteCommand, x:DataType=vm:TrainsSearchViewModel}" CommandParameter="{Binding}" />
+                        </Grid.GestureRecognizers>
+                        <!-- Title -->
+                        <Label Grid.Row="0"
+                            Text="{Binding NumberWithCategory}"
+                            FontSize="16"
+                            LineBreakMode="WordWrap"
+                            TextColor="{StaticResource Gray700}" />
+                        <StackLayout Orientation="Horizontal" Spacing="20" Grid.Row="1">
+                            <Label
+                                Text="{Binding DepartureTime}"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                TextColor="{StaticResource Gray700}" />
+
+                            <!-- Area -->
+                            <Label 
+                                Text="{Binding DepartureStationName, Converter={StaticResource TextTitleCaseConverter}}"
+                                FontSize="14"
+                                TextColor="{StaticResource Gray700}" />
+                            <!-- Hours -->
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal" Spacing="20" Grid.Row="2">
+                            <Label
+                                Text="{Binding ArrivalTime}"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                TextColor="{StaticResource Gray700}" />
+                            <Label 
+                                Text="{Binding ArrivalStationName, Converter={StaticResource TextTitleCaseConverter}}"
+                                FontSize="14"
+                                TextColor="{StaticResource Gray700}" />
+                        </StackLayout>
+
+
+                        <Image Source="emptystar.png" Grid.RowSpan="3" WidthRequest="24" HeightRequest="24" VerticalOptions="Fill" Grid.Column="3">
+                            <Image.Triggers>
+                                <DataTrigger TargetType="Image"
+                                    Binding="{Binding IsFavorite}" Value="True">
+                                    <Setter Property="Source" Value="fullstar.png"/>
+                                </DataTrigger>
+                            </Image.Triggers>
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:TrainsSearchViewModel}},Path=SetFavoriteCommand, x:DataType=vm:TrainsSearchViewModel}" CommandParameter="{Binding}" />
+                            </Image.GestureRecognizers>
+                        </Image>
+
+                        <VerticalStackLayout Grid.RowSpan="3" VerticalOptions="Center" Grid.Column="2" Padding="0,0,20,0" Spacing="20">
+                            <VerticalStackLayout.Triggers>
+                                <DataTrigger TargetType="VerticalStackLayout"
+                                             Binding="{Binding HasWarning}" Value="True">
+                                    <Setter Property="VerticalOptions" Value="Fill"/>
+                                </DataTrigger>
+                            </VerticalStackLayout.Triggers>
+                            <Label  
+                                    Text="{Binding FormattedDelay}"
+                                    FontSize="18"
+                                    FontAttributes="Bold"
+                                    TextColor="{Binding Ritardo, Converter={StaticResource Key=CompareConverter}}"
+                                    LineBreakMode="WordWrap" />
+                            <Image Source="alert.png" WidthRequest="24" IsVisible="{Binding HasWarning}" HeightRequest="24" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+            </Grid>
+        </DataTemplate>
     </ContentPage.Resources>
-    <Grid RowDefinitions="*">
-        <VerticalStackLayout Padding="10" Spacing="10">
-            <!-- Header Section -->
-            <Frame CornerRadius="8"
-                       Padding="12"
-                       HasShadow="True"
-                       Margin="3,0,3,10"
-                       BackgroundColor="#fffdf8">
-            
-                <VerticalStackLayout  Spacing="8">
-                    <Label Text="Inserisci il numero del treno" FontSize="16" FontAttributes="Bold" TextColor="#333"/>
-                    <SearchBar x:Name="searchBar" Keyboard="Numeric" SearchCommand="{Binding SearchTrainCommand}" BackgroundColor="Transparent" SearchCommandParameter="{Binding Text, x:DataType='searchBar', Source={x:Reference searchBar}}"  HorizontalOptions="Start" Placeholder="Numero treno" FontSize="14" Text="{Binding CurrentTrain}"/>
-                </VerticalStackLayout>
+    <Grid RowDefinitions="Auto, *, 4"
+           Margin="8" 
+           RowSpacing="16">
+        <StackLayout BackgroundColor="#fffdf8" Spacing="20" Orientation="Horizontal" HorizontalOptions="Center" Margin="0,12,0,0">
+            <Image Source="search.png" WidthRequest="24" Margin="20,0,0,0" HeightRequest="24" BackgroundColor="Transparent" HorizontalOptions="Start" >
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SearchTrainCommand}" CommandParameter="{Binding Text, Source={x:Reference searchBar}}"/>
+                </Image.GestureRecognizers>
+            </Image>
+            <Entry Keyboard="Numeric" ReturnType="Done" x:Name="searchBar" Style="{StaticResource CommonEntryHeaderStyle}" Text="{Binding CurrentTrainNumber}" FontSize="15" ClearButtonVisibility="WhileEditing" 
+                   ReturnCommand="{Binding SearchTrainCommand}" ReturnCommandParameter="{Binding}"
+                    Placeholder="Inserisci il numero di un treno" PlaceholderColor="{StaticResource Gray500}" VerticalOptions="Center"
+                 />
 
-            </Frame>
-            <!-- Search bar -->
-            <!--<SearchBar x:Name="searchBar" Shadow="True" SearchCommand="{Binding LoadResultsCommand}" SearchCommandParameter="{Binding Text, x:DataType='searchBar', Source={x:Reference searchBar}}"  HorizontalOptions="Start" Placeholder="Numero treno" FontSize="14" Text="{Binding CurrentTrain}"/>-->
-            <!--<Entry Placeholder="Numero del treno" Text="{Binding CurrentTrain}" />
-            <Button Text="Search" Command="{Binding LoadResultsCommand}" CommandParameter="{Binding CurrentTrain}" />-->
-            <!-- Train list -->
-            <RefreshView Command="{Binding LoadDataCommand}" IsRefreshing="{Binding IsRefreshing}" RefreshColor="Transparent">
-                <ScrollView>
-                    <CollectionView x:Name="collectionView" ItemsSource="{Binding RecentTrains}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="model:RecentTrain">
-                            <Frame CornerRadius="0"
-                                   Padding="6"
-                                   HasShadow="True"
-                                   Margin="3,0,3,0"
-                                   BackgroundColor="#fffdf8">
-                                <Frame.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Path=Viewmodel.LoadTrainDetailsCommand, Source={x:Reference this}}" CommandParameter="{Binding}"/>
-                                </Frame.GestureRecognizers>
-                                <Grid BackgroundColor="#fffdf8" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,0">
-                                    <VerticalStackLayout Grid.Row="0" Grid.ColumnSpan="3" Spacing="4" Margin="8,0,0,0">
-                                        <Label Grid.Column="0" Text="{Binding DepartureStationName, Converter={StaticResource TextTitleCaseConverter}}" FontSize="15" FontAttributes="Bold" TextColor="#333"/>
-                                        <StackLayout Orientation="Horizontal" Spacing="16">
-                                            <Label Text="Partenza" FontSize="14" TextColor="#666"/>
-                                            <Label Text="{Binding DepartureTime}" FontSize="14" TextColor="#666"/>
-                                            
-                                        </StackLayout>
-                                        <Label Grid.Row="1" Grid.Column="0" Text="{Binding ArrivalStationName, Converter={StaticResource TextTitleCaseConverter}}" FontSize="15" FontAttributes="Bold" TextColor="#333"/>
-                                        <StackLayout Orientation="Horizontal" Spacing="16">
-                                            
-                                            <Label Text="Arrivo" FontSize="14" TextColor="#333"/>
-                                            <Label Text="{Binding ArrivalTime}" FontSize="14" TextColor="#666"/>
-                                        </StackLayout>
-                                        <!--<Label Grid.Column="0" Text="{Binding ArrivalStationName}" FontSize="14" TextColor="#666"/>
-                                        <StackLayout Orientation="Horizontal" Spacing="16">
-                                            <Label Text="Arrivo" FontSize="14" TextColor="#333"/>
-                                            <Label Text="{Binding ArrivalTime}" FontSize="14" TextColor="#666"/>
-                                            --><!--#4CAF50--><!--
-                                        </StackLayout>-->
-                                    </VerticalStackLayout>
-                                    <StackLayout Grid.Column="2" Orientation="Horizontal" Spacing="3">
-                                        <Label Text="{Binding CurrentDelay,StringFormat='{}{0}\''}" Grid.Column="2" FontSize="14" FontAttributes="Bold" />
-                                        <Image Source="alert.png" IsVisible="{Binding HasWarning}" />
-                                    </StackLayout>
-                                </Grid>
-                            </Frame>
+        </StackLayout>
 
+        <RefreshView Grid.Row="1" 
+         Command="{Binding LoadDataCommand}" 
+         IsRefreshing="{Binding IsRefreshing}" 
+         RefreshColor="{StaticResource BrandColor}"
+         Margin="0,0,0,0">
+            <CollectionView x:Name="collectionView" ItemsSource="{Binding RecentTrains}"
+                VerticalScrollBarVisibility="Never"
+                SelectionMode="None"
+                ItemTemplate="{StaticResource TrainDataTemplate}"
+                Margin="0">
+            </CollectionView>
+        </RefreshView>
 
-
-                            <!--<Frame BorderColor="#e0e0e0"
-                                   CornerRadius="5"
-                                   Padding="10"
-                                   HasShadow="False">
-                                <Grid ColumnDefinitions="Auto,*,Auto"
-                                      RowDefinitions="Auto,Auto"
-                                      ColumnSpacing="10">
-
-                                    --><!-- Train info --><!--
-                                    <Label Grid.Row="0" Grid.Column="0"
-                                           Text="{Binding Number}"
-                                           FontAttributes="Bold"
-                                           VerticalOptions="Start" />
-
-                                    <Label Grid.Row="0" Grid.Column="1"
-                                           Text="{Binding DepartureStationName}"
-                                           FontAttributes="Bold"
-                                           VerticalOptions="Start" />
-                                    
-                                    --><!-- Departure --><!--
-                                    <Label Grid.Row="1" Grid.Column="0"
-                                           Text="{Binding ArrivalStationName}"
-                                           FontAttributes="Bold" />
-
-                                    <Label Grid.Row="1" Grid.Column="1"
-                                           Text="{Binding DepartureTime}" />
-
-                                    --><!-- Arrival --><!--
-                                    <Label Grid.Row="2" Grid.Column="0"
-                                           Text="{Binding ArrivalTime}"
-                                           FontAttributes="Bold" />
-
-                                    <Label Grid.Row="2" Grid.Column="1"
-                                           Text="{Binding CurrentDelay}" />
-
-                                </Grid>
-                            </Frame>-->
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-                </ScrollView>
-            </RefreshView>
-        </VerticalStackLayout>
-        <controls:CustomActivityIndicator IsVisible="{Binding LoadDataCommand.IsRunning}" />
+        <controls:CustomActivityIndicator Grid.RowSpan="2" 
+                              IsVisible="{Binding LoadDataCommand.IsRunning}"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" />
     </Grid>
 </pages:BaseContentPage>

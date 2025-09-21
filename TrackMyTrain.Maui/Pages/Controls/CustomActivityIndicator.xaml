@@ -4,7 +4,7 @@
              x:Class="TrackMyTrain.Maui.Pages.Controls.CustomActivityIndicator">
     <ContentView.Resources>
         <Style x:Key="gridStyle" TargetType="Grid">
-            <Setter Property="BackgroundColor" Value="{StaticResource Gray300}" />
+            <Setter Property="BackgroundColor" Value="Transparent" />
             <Setter Property="Opacity" Value="0.5" />
         </Style>
     </ContentView.Resources>

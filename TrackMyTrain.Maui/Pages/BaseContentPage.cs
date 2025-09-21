@@ -21,5 +21,11 @@ namespace TrackMyTrain.Maui.Pages
             base.OnAppearing();
             _viewModel.Appearing();
         }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            _viewModel.Disappearing();
+        }
     }
 }

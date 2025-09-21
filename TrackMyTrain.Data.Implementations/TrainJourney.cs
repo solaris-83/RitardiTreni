@@ -42,11 +42,13 @@ namespace TrackMyTrain.Data.Implementations
             string Categoria,
             int? Ritardo,
             string compOraUltimoRilevamento,
+            bool NonPartito,
+            bool Arrivato,
             List<Fermata> Fermate
     )
     {
         public TrainJourney() : this(   
-            default!, default!, default!, default!, default, default, default!, default!, default!, default!,
+            default!, default!, default!, default!, default, default, default!, default!, default!, default!,default!,default!,
             default, default!, default!, default!, default!, default!, default!, default!, default!, default!, new List<Fermata>())
         {
         }
