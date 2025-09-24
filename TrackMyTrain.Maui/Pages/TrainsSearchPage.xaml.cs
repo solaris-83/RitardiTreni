@@ -17,8 +17,8 @@ public partial class TrainsSearchPage : BaseContentPage<TrainsSearchViewModel>
         collectionView.ScrollTo(0, -1, ScrollToPosition.Start, true);
     }
 
-    protected override void OnDisappearing()
-    {
-        _viewModel.SearchTrainCompleted -= _viewModel_SearchTrainCompleted;
-    }
+    //protected override void OnDisappearing()
+    //{
+    //    _viewModel.SearchTrainCompleted -= _viewModel_SearchTrainCompleted;
+    //}
 }

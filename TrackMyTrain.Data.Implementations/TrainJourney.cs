@@ -56,7 +56,12 @@ namespace TrackMyTrain.Data.Implementations
         public bool HasWarning()
         {
             if (TipoTreno == "PG")
-                return false;
+            {
+                if (NonPartito)
+                    return true;
+                else
+                    return false;
+            }
             if (TipoTreno == "ST" && Provvedimento == 1)
                 return true;
             if ((TipoTreno == "PP" || TipoTreno == "SI" || TipoTreno == "SF") && (Provvedimento == 0 || Provvedimento == 2))
@@ -64,6 +69,17 @@ namespace TrackMyTrain.Data.Implementations
             if (TipoTreno == "DV" && Provvedimento == 3)
                 return true;
             throw new NotImplementedException($"TipoTreno {TipoTreno} and Provvedimento {Provvedimento} not recognized");
+        }
+
+        public string FormatDelay()
+        {
+            if (NonPartito)
+                return string.Empty;
+            if (Ritardo == null)
+                return string.Empty;
+            if (HasWarning() && Ritardo == 0)
+                return string.Empty;
+            return $"{Ritardo}'";
         }
     }
 }

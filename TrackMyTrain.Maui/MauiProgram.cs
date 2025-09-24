@@ -28,8 +28,6 @@ namespace TrackMyTrain.Maui
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                    fonts.AddFont("FA-Regular-400.otf", "FaRegular");
-                    fonts.AddFont("FA-Solid-900.otf", "FaSolid");
                 });
 
 #if DEBUG

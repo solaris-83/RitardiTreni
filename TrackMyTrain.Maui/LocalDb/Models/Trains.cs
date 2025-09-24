@@ -7,16 +7,14 @@ namespace TrackMyTrain.Maui.LocalDb.Models
     {
         [Indexed(Name = "IX_TrainNumber", Order = 1)]
         public string Number { get; set; }
-
         [Indexed(Name = "IX_DepartureStationName", Order = 2)]
         public string DepartureStationName { get; set; }
-
+        public string NumberWithCategory { get; set; }
         public string DepartureStationShortCode {  get; set; }
-
         public string ArrivalStationName { get; set; }
-
         public string ArrivalStationShortCode { get; set; }
-
+        public string DepartureTime { get; set; }
+        public string ArrivalTime { get; set; }
         public bool IsFavorite {  get; set; }
 
         public Trains()

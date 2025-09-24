@@ -43,7 +43,7 @@
                              Radius="10"
                              Offset="0,0" />
                     </Border.Shadow>
-                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto, *, Auto, Auto, 20" RowSpacing="8">
+                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto, *, Auto, 15, Auto, 5" RowSpacing="8">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer NumberOfTapsRequired="2" Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:TrainsSearchViewModel}},Path=DeleteCommand, x:DataType=vm:TrainsSearchViewModel}" CommandParameter="{Binding}" />
                         </Grid.GestureRecognizers>
@@ -53,6 +53,11 @@
                             FontSize="16"
                             LineBreakMode="WordWrap"
                             TextColor="{StaticResource Gray700}" />
+                        <Image Source="three_dots.png" HeightRequest="18" WidthRequest="18" Grid.Row="0" Grid.Column="5" >
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:TrainsSearchViewModel}},Path=ShowLastTrackedPositionCommand, x:DataType=vm:TrainsSearchViewModel}" CommandParameter="{Binding .}" />
+                            </Image.GestureRecognizers>
+                        </Image>
                         <StackLayout Orientation="Horizontal" Spacing="20" Grid.Row="1">
                             <Label
                                 Text="{Binding DepartureTime}"
@@ -79,8 +84,8 @@
                                 TextColor="{StaticResource Gray700}" />
                         </StackLayout>
 
-
-                        <Image Source="emptystar.png" Grid.RowSpan="3" WidthRequest="24" HeightRequest="24" VerticalOptions="Fill" Grid.Column="3">
+                      
+                        <Image Source="emptystar.png" Grid.RowSpan="3" WidthRequest="18" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Fill" Grid.Column="2">
                             <Image.Triggers>
                                 <DataTrigger TargetType="Image"
                                     Binding="{Binding IsFavorite}" Value="True">
@@ -92,20 +97,22 @@
                             </Image.GestureRecognizers>
                         </Image>
 
-                        <VerticalStackLayout Grid.RowSpan="3" VerticalOptions="Center" Grid.Column="2" Padding="0,0,20,0" Spacing="20">
+
+
+                        <VerticalStackLayout Grid.RowSpan="3" VerticalOptions="Center" Grid.Column="4" Padding="0,0,0,0" Spacing="20">
                             <VerticalStackLayout.Triggers>
                                 <DataTrigger TargetType="VerticalStackLayout"
-                                             Binding="{Binding HasWarning}" Value="True">
+                                      Binding="{Binding HasWarning}" Value="True">
                                     <Setter Property="VerticalOptions" Value="Fill"/>
                                 </DataTrigger>
                             </VerticalStackLayout.Triggers>
                             <Label  
-                                    Text="{Binding FormattedDelay}"
-                                    FontSize="18"
-                                    FontAttributes="Bold"
-                                    TextColor="{Binding Ritardo, Converter={StaticResource Key=CompareConverter}}"
-                                    LineBreakMode="WordWrap" />
-                            <Image Source="alert.png" WidthRequest="24" IsVisible="{Binding HasWarning}" HeightRequest="24" />
+                                Text="{Binding FormattedDelay}"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                TextColor="{Binding Ritardo, Converter={StaticResource Key=CompareConverter}}"
+                                LineBreakMode="WordWrap" />     
+                            <Image Source="alert.png" WidthRequest="18" IsVisible="{Binding HasWarning}" HeightRequest="18" />
                         </VerticalStackLayout>
                     </Grid>
                 </Border>

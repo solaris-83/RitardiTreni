@@ -10,17 +10,17 @@
     <!-- Azure Dev Summit Inspired Color Palette -->
 
     <!-- Primary Azure Blues -->
-    <Color x:Key="Primary">#02347e</Color>
+    <Color x:Key="Primary">Red</Color>
     <!-- Default Azure Blue -->
-    <Color x:Key="PrimaryDark">#02347e</Color>
+    <Color x:Key="PrimaryDark">Red</Color>
     <!-- Darker Azure Blue -->
     <Color x:Key="PrimaryLight">#40E0FF</Color>
     <!-- Light Azure -->
 
     <!-- Theme-specific Primary Colors -->
-    <Color x:Key="LightPrimary">#02347e</Color>
+    <Color x:Key="LightPrimary">Red</Color>
     <!-- Bright Azure Blue for light theme -->
-    <Color x:Key="DarkPrimary">	#02347e</Color>
+    <Color x:Key="DarkPrimary">Red</Color>
     <!-- Softer, lighter blue for dark theme (easier on eyes) -->
 
     <!-- Light Theme Colors -->
