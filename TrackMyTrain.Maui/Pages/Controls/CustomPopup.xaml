@@ -1,29 +1,32 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             CanBeDismissedByTappingOutsideOfPopup="True"
+             xmlns:vm="clr-namespace:TrackMyTrain.Maui.ViewModels"
+             Background="{StaticResource Gray200}"
              x:Class="TrackMyTrain.Maui.Pages.Controls.CustomPopup">
+    <toolkit:Popup.Resources>
+        <toolkit:IsStringNotNullOrEmptyConverter x:Key ="IsStringNotNullOrEmptyConverter"/>
+    </toolkit:Popup.Resources>
+    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+        <Label Text="{Binding Information.Item1}" TextColor="{StaticResource Red}"
+        Grid.Row="0"
+        FontSize="14" />
 
-    <Frame CornerRadius="10" Padding="10" HasShadow="True" BorderColor="{StaticResource BrandColor}" Background="White">
+        <Label Text="{Binding Information.Item2, StringFormat='{}Ultimo rilevamento {0}'}"
+         Grid.Row="1"
+        TextColor="{StaticResource Gray700}"
+        IsVisible="{Binding Information.Item2, Converter={StaticResource Key=IsStringNotNullOrEmptyConverter}}"
+        FontSize="14"
+        />
 
-        <VerticalStackLayout Padding="20" Spacing="15">
-            <!-- Header -->
-            <Label Text="Popup Header"
-               FontSize="20"
-               FontAttributes="Bold"
-               HorizontalOptions="Center" />
+        <Label Text="{Binding Information.Item3, StringFormat='{}alle ore {0}'}"
+         Grid.Row="2"
+        IsVisible="{Binding Information.Item3, Converter={StaticResource Key=IsStringNotNullOrEmptyConverter}}"
+        TextColor="{StaticResource Gray700}"
+        FontSize="14"/>
+    </VerticalStackLayout>
+</toolkit:Popup>
 
-            <!-- Message -->
-            <Label Text="This is your custom popup message."
-               FontSize="16"
-               HorizontalOptions="Center"
-               HorizontalTextAlignment="Center" />
-
-            <!-- Button -->
-            <Button Text="OK"
-                    Command="{Binding CloseCommand}"
-                HorizontalOptions="Center" />
-        </VerticalStackLayout>
-
-    </Frame>
-
-</ContentView>

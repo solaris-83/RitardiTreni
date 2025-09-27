@@ -57,7 +57,8 @@ namespace TrackMyTrain.Data.Implementations
         {
             if (TipoTreno == "PG")
             {
-                if (NonPartito)
+                // Se non è partito dopo 5 minuti dall'orario programmato
+                if (NonPartito && OrarioPartenza.HasValue && DateTimeOffset.FromUnixTimeMilliseconds(OrarioPartenza.Value).ToLocalTime() < DateTime.Now.AddMinutes(-5))
                     return true;
                 else
                     return false;
@@ -65,6 +66,8 @@ namespace TrackMyTrain.Data.Implementations
             if (TipoTreno == "ST" && Provvedimento == 1)
                 return true;
             if ((TipoTreno == "PP" || TipoTreno == "SI" || TipoTreno == "SF") && (Provvedimento == 0 || Provvedimento == 2))
+                return true;
+            if (TipoTreno == "VO" && Provvedimento == 3) // Parzialmente cancellato
                 return true;
             if (TipoTreno == "DV" && Provvedimento == 3)
                 return true;

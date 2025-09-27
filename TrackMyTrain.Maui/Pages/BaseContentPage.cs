@@ -1,4 +1,6 @@
 ﻿
+using CommunityToolkit.Maui.Behaviors;
+using CommunityToolkit.Maui.Core;
 using TrackMyTrain.Maui.ViewModels;
 
 namespace TrackMyTrain.Maui.Pages
@@ -10,6 +12,11 @@ namespace TrackMyTrain.Maui.Pages
         protected BaseContentPage(TViewModel viewModel)
         {
             base.BackgroundColor = Color.FromArgb("#e5e5e5");
+            this.Behaviors.Add(new StatusBarBehavior
+            {
+                StatusBarColor = Colors.Green,
+                StatusBarStyle = StatusBarStyle.LightContent
+            });
             base.BindingContext = viewModel;
             _viewModel = viewModel;
         }

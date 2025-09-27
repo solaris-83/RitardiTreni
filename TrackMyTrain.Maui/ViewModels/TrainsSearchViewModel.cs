@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Maui;
+﻿
+using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -17,7 +18,10 @@ namespace TrackMyTrain.Maui.ViewModels
         private readonly IPopupService _popupService;
         private readonly LocalDbService _dbService;
         private readonly ILogger<TrainsSearchViewModel> _logger;
+        private const byte MAX_NUMBER_OF_FAVORITE_TRAINS = 15;
+        private const byte MAX_NUMBER_OF_SEARCHED_TRAINS = 5;
 
+        public bool CanRefresh { get; private set; } = true;
         public TrainsSearchViewModel(ILogger<TrainsSearchViewModel> logger, INotificationHandler notificationHandler, IHttpDataService httpDataService, IPopupService popupService, LocalDbService dbService) : base(notificationHandler)
         {
             _httpDataService = httpDataService;
@@ -31,20 +35,27 @@ namespace TrackMyTrain.Maui.ViewModels
         private string _currentTrainNumber;
 
         [ObservableProperty]
-        private ObservableCollection<RecentTrain> _recentTrains = new ObservableCollection<RecentTrain>();
+        private ObservableCollection<RecentTrainGroup> _recentTrains = new ObservableCollection<RecentTrainGroup>();
 
         public event EventHandler SearchTrainCompleted;
 
         public override void Appearing()
         {
             base.Appearing();
-            _ = LoadDataCommand.ExecuteAsync(default);
+            if (CanRefresh)
+                _ = LoadDataCommand.ExecuteAsync(default);
+            CanRefresh = true;
         }
 
         [RelayCommand]
-        private async Task ShowLastTrackedPositionAsync(RecentTrain recentTrain)
+        private void ShowLastTrackedPosition(RecentTrain recentTrain)
         {
-
+            var queryAttributes = new Dictionary<string, object>
+            {
+                { "RecentTrain", recentTrain }
+            };
+            CanRefresh = false;
+            _popupService.ShowPopup<CustomPopupViewModel>(Shell.Current, new PopupOptions() { CanBeDismissedByTappingOutsideOfPopup = true }, queryAttributes);
         }
 
         [RelayCommand]
@@ -62,10 +73,22 @@ namespace TrackMyTrain.Maui.ViewModels
         {
             try
             {
-                var results = (await _dbService.GetAllAsync<Trains>())
-                    .OrderByDescending(res => res.IsFavorite)
-                    .ThenByDescending(res => res.CreatedAt)
-                    .ToList();
+                var allTrains = await _dbService.GetAllAsync<Trains>();
+
+                var favorites = allTrains
+                    .Where(t => t.IsFavorite);
+
+                var nonFavorites = allTrains
+                    .Where(t => !t.IsFavorite)
+                    .OrderByDescending(t => t.LastUpdatedAt);
+
+                var topNonFavorites = nonFavorites.Take(MAX_NUMBER_OF_SEARCHED_TRAINS);
+                var otherNonFavorites = nonFavorites.Skip(MAX_NUMBER_OF_SEARCHED_TRAINS);
+                await _dbService.DeleteItemsAsync(otherNonFavorites);
+
+                var results = favorites
+                    .Concat(topNonFavorites)
+                    .OrderByDescending(t => t.LastUpdatedAt);
 
                 var errors = new List<Exception>();
 
@@ -85,14 +108,19 @@ namespace TrackMyTrain.Maui.ViewModels
                     }
                 });
 
-                var itemsToLoad = (await Task.WhenAll(tasks))
-                    .Where(x => x != null)
+                var taskCompleted = await Task.WhenAll(tasks);
+
+                var itemsToLoadGrouped = taskCompleted
+                   // .Where(x => x != null)               // filter out nulls
+                    .Cast<RecentTrain>()                 // cast safely since nulls are gone
+                    .GroupBy(train => train.IsFavorite)  // group by IsFavorite
+                    .Select(g => new RecentTrainGroup(g.Key, g)) // pass group to ctor
                     .ToList();
 
-                RecentTrains = new ObservableCollection<RecentTrain>(itemsToLoad);
+                RecentTrains = new ObservableCollection<RecentTrainGroup>(itemsToLoadGrouped);
 
                 // Show just one error popup if there were failures
-                if (errors.Any())
+                if (errors.Count != 0)
                 {
                     NotificationHandler.HandleError(errors.First());
                 }
@@ -107,54 +135,7 @@ namespace TrackMyTrain.Maui.ViewModels
                 IsRefreshing = false;
             }
         }
-        /*    private async Task LoadDataAsync()
-            {
-                try
-                {
-                    var results = await _dbService.GetAllAsync<Trains>();
-                    results = results.OrderByDescending(res => res.IsFavorite).ThenByDescending(res => res.CreatedAt);
-                    RecentTrains.Clear();
-                    // Recupero i dati necessari dell'andamento del treno e li preparo per mostrarli
-                    if (results.Any())
-                    {
-                        var itemsToLoad = new List<RecentTrain>();
-
-                        foreach (var train in results)
-                        {
-                            TrainAutocomplete autocompleteTrain = new TrainAutocomplete(train.DepartureStationName, train.Number, train.DepartureStationShortCode, new DateTimeOffset(DateTime.Today).ToUnixTimeMilliseconds());
-                            TrainJourney trainJourney = await _httpDataService.GetTrainJourneyAsync(autocompleteTrain);
-                            if (trainJourney != null)
-                            {
-                                itemsToLoad.Add(new RecentTrain(train.ID, trainJourney.CompNumeroTreno, autocompleteTrain.TrainNumber, autocompleteTrain.DepartureStationName, train.ArrivalStationName, trainJourney.CompOrarioPartenza, trainJourney.CompOrarioArrivo, trainJourney.Ritardo, trainJourney.FormatDelay(), trainJourney.HasWarning(), train.IsFavorite));
-                            }
-                            //// Carico solo i treni che circolano oggi
-                            //if (stationTrains.Any())
-                            //{
-                            //    TrainAutocomplete autocompleteTrain = stationTrains.SingleOrDefault(tr => tr.TrainNumber == train.Number && tr.DepartureStationShortCode == train.DepartureStationShortCode);
-                            //    if (autocompleteTrain == null)
-                            //    {
-                            //        _logger.LogError($"Couldn't find a train matching with number {train.Number} and departure station code {train.DepartureStationShortCode}");
-                            //        continue;
-                            //    }
-
-                            //    TrainJourney trainJourney = await _httpDataService.GetTrainJourneyAsync(autocompleteTrain);
-                            //    itemsToLoad.Add(new RecentTrain(train.ID, trainJourney.CompNumeroTreno, autocompleteTrain.TrainNumber, autocompleteTrain.DepartureStationName, train.ArrivalStationName, trainJourney.CompOrarioPartenza, trainJourney.CompOrarioArrivo, trainJourney.Ritardo, FormatDelay(trainJourney), trainJourney.HasWarning(), train.IsFavorite));
-                            //}
-                        }
-
-                        RecentTrains = new ObservableCollection<RecentTrain>(itemsToLoad);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    NotificationHandler.HandleError(ex);
-                }
-                finally
-                {
-                    IsRefreshing = false;
-                }
-            }
-    */
+        
         private async Task<RecentTrain?> MapToRecentTrainAsync(Trains train)
         {
             var autocompleteTrain = new TrainAutocomplete(
@@ -166,7 +147,7 @@ namespace TrackMyTrain.Maui.ViewModels
             var trainJourney = await _httpDataService.GetTrainJourneyAsync(autocompleteTrain);
             if (trainJourney == null) return null;
 
-            return new RecentTrain(
+            var mappedTrain = new RecentTrain(
                 train.ID,
                 trainJourney.CompNumeroTreno,
                 autocompleteTrain.TrainNumber,
@@ -177,7 +158,38 @@ namespace TrackMyTrain.Maui.ViewModels
                 trainJourney.Ritardo,
                 trainJourney.FormatDelay(),
                 trainJourney.HasWarning(),
-                train.IsFavorite);
+                train.IsFavorite,
+                trainJourney.SubTitle,
+                trainJourney.compOraUltimoRilevamento,
+                trainJourney.StazioneUltimoRilevamento, 
+                trainJourney.NonPartito);
+
+            mappedTrain.PropertyChanged += Train_PropertyChanged;
+            return mappedTrain;
+        }
+
+        private void MoveTrainBetweenGroups(RecentTrain train)
+        {
+            // Rimuovo dal vecchio gruppo
+            var oldGroup = RecentTrains.FirstOrDefault(g => g.Any(t => t == train));
+            if (oldGroup != null)
+            {
+                oldGroup.Remove(train);
+                if (oldGroup.Count == 0)
+                    RecentTrains.Remove(oldGroup);
+            }
+
+            // Aggiungo al nuovo gruppo
+            var newGroup = RecentTrains.FirstOrDefault(g => g.IsFavorite == train.IsFavorite);
+            if (newGroup == null)
+            {
+                newGroup = new RecentTrainGroup(train.IsFavorite, new ObservableCollection<RecentTrain>() { train });
+                RecentTrains.Add(newGroup);
+            }
+            else
+            {
+                newGroup.Add(train);
+            }
         }
 
         [RelayCommand]
@@ -189,7 +201,14 @@ namespace TrackMyTrain.Maui.ViewModels
                 if (success)
                 {
                     await _dbService.DeleteItemByKeyAsync<Trains>(trainToDelete.ID);
-                    RecentTrains.Remove(trainToDelete);
+                    var group = RecentTrains.FirstOrDefault(g => g.IsFavorite == trainToDelete.IsFavorite);
+                    if (group != null)
+                    {
+                        trainToDelete.PropertyChanged -= Train_PropertyChanged;
+                        group.Remove(trainToDelete); // remove from inner collection
+                        if (group.Count == 0)
+                            RecentTrains.Remove(group);
+                    }
                 }
             }
             catch (Exception ex)
@@ -205,6 +224,14 @@ namespace TrackMyTrain.Maui.ViewModels
         [RelayCommand]
         private async Task SetFavoriteAsync(RecentTrain favoriteTrain)
         {
+            // Non è possibile aggiungere oltre 15 preferiti
+            var allTrains = await _dbService.GetAllAsync<Trains>();
+            var numberOfFavoriteTrains = allTrains.Count(t => t.IsFavorite);
+            if (numberOfFavoriteTrains >= MAX_NUMBER_OF_FAVORITE_TRAINS && favoriteTrain.IsFavorite == false)
+            {
+                NotificationHandler.HandleError(new Exception($"Raggiunto il limite massimo di {MAX_NUMBER_OF_FAVORITE_TRAINS} preferiti. Rimuovere un treno dai preferiti per proseguire."));
+                return;
+            }
             var train = await _dbService.GetItemByKeyAsync<Trains>(favoriteTrain.ID);
             train.IsFavorite = !train.IsFavorite;
             await _dbService.UpdateItemAsync(train);
@@ -243,19 +270,18 @@ namespace TrackMyTrain.Maui.ViewModels
                 {
                     autocompleteTrain = stationTrains.Single();
                 }
-                // Recupero le info sull'andamento del treno
-                TrainJourney trainJourney = await _httpDataService.GetTrainJourneyAsync(autocompleteTrain);
                 // Se non ancora presente a DB lo aggiungo
                 var existingTrain = await _dbService.GetFirstFilteredAsync<Trains>(train => train.DepartureStationName == autocompleteTrain.DepartureStationName && train.Number == autocompleteTrain.TrainNumber);
-                int newID = 0;
-                if (existingTrain == null /*|| !existingTrain.Any()*/)
+                if (existingTrain == null)
                 {
+                    // Recupero le info sull'andamento del treno
+                    TrainJourney trainJourney = await _httpDataService.GetTrainJourneyAsync(autocompleteTrain);
                     var trainToAdd = new Trains()
                     {
                         IsFavorite = false,
                         DepartureStationName = autocompleteTrain.DepartureStationName,
                         DepartureStationShortCode = autocompleteTrain.DepartureStationShortCode,
-                        ArrivalStationName = trainJourney.Destinazione, 
+                        ArrivalStationName = trainJourney.Destinazione,
                         ArrivalStationShortCode = trainJourney.IdDestinazione,
                         Number = autocompleteTrain.TrainNumber,
                         NumberWithCategory = trainJourney.Categoria,
@@ -263,17 +289,29 @@ namespace TrackMyTrain.Maui.ViewModels
                         ArrivalTime = trainJourney.CompOrarioArrivo
                     };
 
-                    newID = await _dbService.AddItemAsync(trainToAdd);
+                    var newID = await _dbService.AddItemAsync(trainToAdd);
+                    var newTrain = new RecentTrain(newID, trainJourney.CompNumeroTreno, autocompleteTrain.TrainNumber, autocompleteTrain.DepartureStationName, trainJourney.Destinazione, trainJourney.CompOrarioPartenza, trainJourney.CompOrarioArrivo, trainJourney.Ritardo, trainJourney.FormatDelay(), trainJourney.HasWarning(), false, trainJourney.SubTitle,
+                        trainJourney.compOraUltimoRilevamento,
+                        trainJourney.StazioneUltimoRilevamento, trainJourney.NonPartito);
+
+                    newTrain.PropertyChanged += Train_PropertyChanged;
+                    var notFavoriteGroup = RecentTrains.FirstOrDefault(group => !group.IsFavorite);
+                    if (notFavoriteGroup != null)
+                    {
+                        notFavoriteGroup.Add(newTrain);
+                    }
+                    else
+                    {
+                        //trainToAdd.IsFavorite è necessariamente false qui
+                        RecentTrains.Add(new RecentTrainGroup(trainToAdd.IsFavorite, new[] { newTrain }));
+                    }
                 }
-                
-                // Lo aggiungo alla CollectionView solo se non già presente
-                if (!RecentTrains.Any(rec => rec.Number == autocompleteTrain.TrainNumber && rec.DepartureStationName == autocompleteTrain.DepartureStationName))
+                else
                 {
-                    RecentTrains.Insert(0, new RecentTrain(newID, trainJourney.CompNumeroTreno, autocompleteTrain.TrainNumber, autocompleteTrain.DepartureStationName, trainJourney.Destinazione, trainJourney.CompOrarioPartenza, trainJourney.CompOrarioArrivo, trainJourney.Ritardo, trainJourney.FormatDelay(), trainJourney.HasWarning(), false));
-                    SearchTrainCompleted?.Invoke(this, EventArgs.Empty);
+                    NotificationHandler.HandleError(new Exception($"Il treno {CurrentTrainNumber} è già presente nella lista"));
                 }
 
-                CurrentTrainNumber = default;
+                 CurrentTrainNumber = default;
             }
             catch (Exception ex)
             {
@@ -281,20 +319,20 @@ namespace TrackMyTrain.Maui.ViewModels
             }
         }
 
-        //private string FormatDelay(TrainJourney trainJourney)
-        //{
-        //    if (trainJourney != null)
-        //    {
-        //        if (trainJourney.NonPartito)
-        //            return string.Empty;
-        //        if (trainJourney.Ritardo == null)
-        //            return string.Empty;
-        //        if (trainJourney.HasWarning() && trainJourney.Ritardo == 0)
-        //            return string.Empty;
-        //        return $"{trainJourney.Ritardo}'";
-        //    }
-        //    else 
-        //        return string.Empty;
-        //}
+        public void Train_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(RecentTrain.IsFavorite) && sender is RecentTrain train)
+            {
+                _logger.LogInformation("Called Train_PropertyChanged");
+                try
+                {
+                    MoveTrainBetweenGroups(train);
+                }
+                catch (Exception ex)
+                {
+                    NotificationHandler.HandleError(ex);
+                }
+            }
+        }
     }
 }

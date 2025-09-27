@@ -1,4 +1,5 @@
 using TrackMyTrain.Maui.ViewModels;
+using System.Linq;
 
 namespace TrackMyTrain.Maui.Pages;
 
@@ -9,7 +10,6 @@ public partial class TrainsSearchPage : BaseContentPage<TrainsSearchViewModel>
     {
         InitializeComponent();
         _viewModel = vm;
-        _viewModel.SearchTrainCompleted += _viewModel_SearchTrainCompleted;
     }
 
     private void _viewModel_SearchTrainCompleted(object? sender, EventArgs e)
@@ -17,8 +17,22 @@ public partial class TrainsSearchPage : BaseContentPage<TrainsSearchViewModel>
         collectionView.ScrollTo(0, -1, ScrollToPosition.Start, true);
     }
 
-    //protected override void OnDisappearing()
-    //{
-    //    _viewModel.SearchTrainCompleted -= _viewModel_SearchTrainCompleted;
-    //}
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        _viewModel.SearchTrainCompleted += _viewModel_SearchTrainCompleted;
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _viewModel.SearchTrainCompleted -= _viewModel_SearchTrainCompleted;
+        foreach (var recentTrain in _viewModel.RecentTrains)
+        {
+            foreach (var train in recentTrain)
+            {
+                train.PropertyChanged -= _viewModel.Train_PropertyChanged;
+            }
+        }
+    }
 }

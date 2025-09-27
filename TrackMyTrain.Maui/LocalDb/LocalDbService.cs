@@ -84,7 +84,15 @@ namespace TrackMyTrain.Maui.Services
                 return await Database.DeleteAsync(item) > 0;
             }
 
-            public async Task<bool> DeleteItemByKeyAsync<TTable>(object primaryKey) where TTable : TableBase, new()
+        public async Task<bool> DeleteItemsAsync<TTable>(IEnumerable<TTable> items) where TTable : TableBase, new()
+        {
+            await CreateTableIfNotExists<TTable>();
+            foreach (var item in items)
+                 await Database.DeleteAsync(item);
+            return true;
+        }
+
+        public async Task<bool> DeleteItemByKeyAsync<TTable>(object primaryKey) where TTable : TableBase, new()
             {
                 await CreateTableIfNotExists<TTable>();
                 return await Database.DeleteAsync<TTable>(primaryKey) > 0;

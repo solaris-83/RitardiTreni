@@ -43,11 +43,6 @@ namespace TrackMyTrain.Maui.ViewModels
         [ObservableProperty]
         private ObservableCollection<StrikeGroup> _strikesGrouped;
 
-        //partial void OnSelectedCategoryChanged(string? oldValue, string newValue)
-        //{
-        //    _ = LoadDataCommand.ExecuteAsync(default);
-        //}
-
         private async Task LoadFeedItems()
         {
             try

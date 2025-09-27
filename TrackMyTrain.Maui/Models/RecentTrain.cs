@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,18 +21,24 @@ namespace TrackMyTrain.Maui.Models
         public int? Ritardo { get; private set; }
         public bool HasWarning { get; private set; }
         public string FormattedDelay { get; private set; }
+        public string SubTitle { get; private set; }
+        public string StazioneUltimoRilevamento { get; private set; }
+        public string CompOraUltimoRilevamento { get; private set; }
         public bool HasWarningAndFormattedDelayIsNotEmpty => HasWarning && !string.IsNullOrEmpty(FormattedDelay);
+        public bool NonPartito { get; private set; }
+        public bool ShowInfoTrain => !(NonPartito && CompOraUltimoRilevamento == "--" && string.IsNullOrWhiteSpace(SubTitle) && StazioneUltimoRilevamento == "--");
+
 
         [ObservableProperty]
         private bool _isFavorite;
-
+        
         public RecentTrain()
         {
         }
 
         public RecentTrain(int id, string numberWithCategory, string number, string departureStationName,
                           string arrivalStationName, string departureTime, string arrivalTime,
-                          int? ritardo, string formattedDelay, bool hasWarning, bool isFavorite)
+                          int? ritardo, string formattedDelay, bool hasWarning, bool isFavorite, string subTitle, string stazioneUltimoRilevamento, string compOraUltimoRilevamento, bool nonPartito)
         {
             ID = id;
             NumberWithCategory = numberWithCategory;
@@ -44,22 +51,22 @@ namespace TrackMyTrain.Maui.Models
             HasWarning = hasWarning;
             IsFavorite = isFavorite;
             FormattedDelay = formattedDelay;
+            SubTitle = subTitle;
+            CompOraUltimoRilevamento = compOraUltimoRilevamento;
+            StazioneUltimoRilevamento = stazioneUltimoRilevamento;
+            NonPartito = nonPartito;
         }
+    }
 
-        //public string FormatDelay(TrainJourney trainJourney)
-        //{
-        //    if (trainJourney != null)
-        //    {
-        //        if (trainJourney.NonPartito)
-        //            return string.Empty;
-        //        if (trainJourney.Ritardo == null)
-        //            return string.Empty;
-        //        if (trainJourney.HasWarning() && trainJourney.Ritardo == 0)
-        //            return string.Empty;
-        //        return $"{trainJourney.Ritardo}'";
-        //    }
-        //    else
-        //        return string.Empty;
-        //}
+    public class RecentTrainGroup : ObservableCollection<RecentTrain>
+    {
+        public bool IsFavorite { get; private set; }
+       // public ObservableCollection<RecentTrain> Values { get; private set; }
+       
+        public RecentTrainGroup(bool isFavorite, IEnumerable<RecentTrain> recentTrains) : base(recentTrains)
+        {
+            IsFavorite = isFavorite;
+           // Values = recentTrains;
+        }
     }
 }

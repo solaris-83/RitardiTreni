@@ -7,3 +7,4 @@ packages/*
 SetupProject/Sources/*
 SetupProject/Output/*
 FileTracciati
+*.csproj.user

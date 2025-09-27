@@ -1,7 +1,7 @@
-﻿using CommunityToolkit.Maui;
-using CommunityToolkit.Maui.Services;
+﻿
+using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+using TrackMyTrain.Maui.Models;
 
 namespace TrackMyTrain.Maui.ViewModels
 {
@@ -10,7 +10,7 @@ namespace TrackMyTrain.Maui.ViewModels
         private readonly IPopupService _popupService;
 
         [ObservableProperty]
-        private string _name;
+        private Tuple<string, string, string> _information;
 
         public CustomPopupViewModel(IPopupService popupService)
         {
@@ -19,15 +19,10 @@ namespace TrackMyTrain.Maui.ViewModels
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            Name = (string)query[nameof(CustomPopupViewModel.Name)];
-        }
-
-        
-
-        [RelayCommand]
-        async Task Close()
-        {
-            var result = await _popupService.ClosePopupAsync(Shell.Current);
+            if (query["RecentTrain"] is RecentTrain recentTrain)
+            {
+                Information = new Tuple<string, string, string>(recentTrain.SubTitle, recentTrain.CompOraUltimoRilevamento, recentTrain.StazioneUltimoRilevamento);
+            }
         }
     }
 }
