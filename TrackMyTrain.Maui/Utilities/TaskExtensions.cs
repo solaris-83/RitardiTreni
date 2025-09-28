@@ -29,5 +29,10 @@ namespace TrackMyTrain.Maui.Utilities
         {
             return groups.SelectMany(g => g).FirstOrDefault(t => t.Number == number && t.DepartureStationName == stationName);
         }
+
+        public static RecentTrain? DeleteTrain(this IEnumerable<RecentTrainGroup> groups, int ID)
+        {
+            return groups.SelectMany(g => g).FirstOrDefault(t => t.ID == ID);
+        }
     }
 }

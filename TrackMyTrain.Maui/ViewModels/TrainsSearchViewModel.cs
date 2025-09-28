@@ -9,6 +9,7 @@ using TrackMyTrain.Data.Interfaces;
 using TrackMyTrain.Maui.LocalDb.Models;
 using TrackMyTrain.Maui.Models;
 using TrackMyTrain.Maui.Services;
+using TrackMyTrain.Maui.Utilities;
 
 namespace TrackMyTrain.Maui.ViewModels
 {
@@ -21,7 +22,7 @@ namespace TrackMyTrain.Maui.ViewModels
         private const byte MAX_NUMBER_OF_FAVORITE_TRAINS = 15;
         private const byte MAX_NUMBER_OF_SEARCHED_TRAINS = 5;
 
-        public bool CanRefresh { get; private set; } = true;
+        private bool _canRefresh = true;
         public TrainsSearchViewModel(ILogger<TrainsSearchViewModel> logger, INotificationHandler notificationHandler, IHttpDataService httpDataService, IPopupService popupService, LocalDbService dbService) : base(notificationHandler)
         {
             _httpDataService = httpDataService;
@@ -37,14 +38,14 @@ namespace TrackMyTrain.Maui.ViewModels
         [ObservableProperty]
         private ObservableCollection<RecentTrainGroup> _recentTrains = new ObservableCollection<RecentTrainGroup>();
 
-        public event EventHandler SearchTrainCompleted;
+        public event EventHandler<int> SearchTrainCompleted;
 
         public override void Appearing()
         {
             base.Appearing();
-            if (CanRefresh)
+            if (_canRefresh)
                 _ = LoadDataCommand.ExecuteAsync(default);
-            CanRefresh = true;
+            _canRefresh = true;
         }
 
         [RelayCommand]
@@ -54,7 +55,7 @@ namespace TrackMyTrain.Maui.ViewModels
             {
                 { "RecentTrain", recentTrain }
             };
-            CanRefresh = false;
+            _canRefresh = false;
             _popupService.ShowPopup<CustomPopupViewModel>(Shell.Current, new PopupOptions() { CanBeDismissedByTappingOutsideOfPopup = true }, queryAttributes);
         }
 
@@ -78,12 +79,14 @@ namespace TrackMyTrain.Maui.ViewModels
                 var favorites = allTrains
                     .Where(t => t.IsFavorite);
 
-                var nonFavorites = allTrains
+                var topNonFavorites = allTrains
                     .Where(t => !t.IsFavorite)
-                    .OrderByDescending(t => t.LastUpdatedAt);
+                    .OrderByDescending(t => t.LastUpdatedAt).Take(MAX_NUMBER_OF_SEARCHED_TRAINS);
 
-                var topNonFavorites = nonFavorites.Take(MAX_NUMBER_OF_SEARCHED_TRAINS);
-                var otherNonFavorites = nonFavorites.Skip(MAX_NUMBER_OF_SEARCHED_TRAINS);
+              //  var topNonFavorites = nonFavorites.Take(MAX_NUMBER_OF_SEARCHED_TRAINS);
+                var otherNonFavorites = allTrains
+                    .Where(t => !t.IsFavorite)
+                    .OrderByDescending(t => t.LastUpdatedAt).Skip(MAX_NUMBER_OF_SEARCHED_TRAINS);
                 await _dbService.DeleteItemsAsync(otherNonFavorites);
 
                 var results = favorites
@@ -208,16 +211,13 @@ namespace TrackMyTrain.Maui.ViewModels
                         group.Remove(trainToDelete); // remove from inner collection
                         if (group.Count == 0)
                             RecentTrains.Remove(group);
+                        SearchTrainCompleted.Invoke(this, RecentTrains.Count);
                     }
                 }
             }
             catch (Exception ex)
             {
                 NotificationHandler.HandleError(ex);
-            }
-            finally
-            {
-                SearchTrainCompleted.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -298,12 +298,20 @@ namespace TrackMyTrain.Maui.ViewModels
                     var notFavoriteGroup = RecentTrains.FirstOrDefault(group => !group.IsFavorite);
                     if (notFavoriteGroup != null)
                     {
-                        notFavoriteGroup.Add(newTrain);
+                        notFavoriteGroup.Insert(0, newTrain);
                     }
                     else
                     {
                         //trainToAdd.IsFavorite è necessariamente false qui
                         RecentTrains.Add(new RecentTrainGroup(trainToAdd.IsFavorite, new[] { newTrain }));
+                    }
+                    // Mantieni un rolling di 5 treni non preferiti
+                    var otherNonFavorites = await _dbService.GetFilteredAsync<Trains>(t => !t.IsFavorite);
+                    var toDelete = otherNonFavorites.OrderByDescending(t => t.LastUpdatedAt).Skip(MAX_NUMBER_OF_SEARCHED_TRAINS);
+                    await _dbService.DeleteItemsAsync(toDelete);
+                    foreach (var item in toDelete)
+                    {
+                        var train = RecentTrains.DeleteTrain(item.ID);
                     }
                 }
                 else

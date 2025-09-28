@@ -17,16 +17,17 @@
             <toolkit:BoolToObjectConverter x:Key="HeaderCollectionViewConverter" 
                                                TrueObject="Preferiti" 
                                                FalseObject="Ultime ricerche" />
+            <toolkit:VariableMultiValueConverter x:Key="VariableMultiValueConverter" 
+                                   ConditionType="Any" />
             <toolkit:CompareConverter x:Key="CompareConverter"
                                   ComparisonOperator="Greater"
                                   ComparingValue="{StaticResource Threshold}"
                                   TrueObject="{StaticResource Red}"
                                   FalseObject="{StaticResource Green}"/>
         </ResourceDictionary>
-        <Style x:Key="CommonEntryHeaderStyle" TargetType="Entry">
-            <Setter Property="FontFamily" Value="OpenSans-Regular" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="WidthRequest" Value="250" />
+        <Style x:Key="CommonLabelHeaderStyle" TargetType="Label">
+            <Setter Property="FontFamily" Value="OpenSansRegular" />
+            <Setter Property="FontSize" Value="15" />
             <Setter Property="TextColor" Value="{StaticResource Gray700}" />
         </Style>
         <DataTemplate x:Key="GroupHeaderDataTemplate" x:DataType="model:RecentTrainGroup">
@@ -59,7 +60,7 @@
                             FontSize="16"
                             LineBreakMode="WordWrap"
                             TextColor="{StaticResource Gray700}" />
-                        <Image Source="three_dots.png" HeightRequest="18" WidthRequest="18" IsVisible="{Binding ShowInfoTrain}" Grid.Row="0" Grid.Column="5" >
+                        <Image Source="three_dots.png" HeightRequest="18" WidthRequest="18" IsVisible="{Binding ShowInfoTrain}" Grid.Row="0" Grid.Column="4" >
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup x:Name="CommonStates">
                                     <VisualState x:Name="Normal" />
@@ -67,7 +68,6 @@
                                         <VisualState.Setters>
                                             <!-- Darken by reducing opacity -->
                                             <Setter Property="Opacity" Value="0.6"/>
-                                           
                                         </VisualState.Setters>
                                     </VisualState>
                                 </VisualStateGroup>
@@ -102,19 +102,19 @@
                                 TextColor="{StaticResource Gray700}" />
                         </StackLayout>
 
-                      
-                        <Image Source="emptystar.png" Grid.RowSpan="3" WidthRequest="18" HeightRequest="18" HorizontalOptions="Center" VerticalOptions="Fill" Grid.Column="2">
-                            <Image.Triggers>
-                                <DataTrigger TargetType="Image"
+                        <Border StrokeThickness="0" Grid.RowSpan="3" HorizontalOptions="Center" BackgroundColor="Transparent" Padding="10,0,0,0" VerticalOptions="Fill" Grid.Column="2">
+                            <Image Source="emptystar.png" WidthRequest="18" HeightRequest="18" >
+                                <Image.Triggers>
+                                    <DataTrigger TargetType="Image"
                                     Binding="{Binding IsFavorite,Mode=TwoWay}" Value="True">
-                                    <Setter Property="Source" Value="fullstar.png"/>
-                                </DataTrigger>
-                            </Image.Triggers>
-                            <Image.GestureRecognizers>
+                                        <Setter Property="Source" Value="fullstar.png"/>
+                                    </DataTrigger>
+                                </Image.Triggers>
+                            </Image>
+                            <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:TrainsSearchViewModel}},Path=SetFavoriteCommand, x:DataType=vm:TrainsSearchViewModel}" CommandParameter="{Binding}" />
-                            </Image.GestureRecognizers>
-                        </Image>
-
+                            </Border.GestureRecognizers>
+                        </Border>
 
 
                         <VerticalStackLayout Grid.RowSpan="3" VerticalOptions="Center" Grid.Column="4" Padding="0,0,0,0" Spacing="20">
@@ -129,7 +129,7 @@
                                 FontSize="16"
                                 FontAttributes="Bold"
                                 TextColor="{Binding Ritardo, Converter={StaticResource Key=CompareConverter}}"
-                                LineBreakMode="WordWrap" />     
+                                LineBreakMode="WordWrap" />
                             <Image Source="alert.png" WidthRequest="18" IsVisible="{Binding HasWarning}" HeightRequest="18" />
                         </VerticalStackLayout>
                     </Grid>
@@ -140,13 +140,13 @@
     <Grid RowDefinitions="Auto, *, 4"
            Margin="8" 
            RowSpacing="16">
-        <StackLayout BackgroundColor="#fffdf8" Spacing="20" Orientation="Horizontal" HorizontalOptions="{OnIdiom Desktop=Center, Phone=Fill}" Margin="0,12,0,0">
+        <StackLayout BackgroundColor="#fffdf8" Spacing="20" Orientation="Horizontal" HorizontalOptions="Fill" Margin="0,12,0,0">
             <Image Source="search.png" WidthRequest="24" Margin="20,0,0,0" HeightRequest="24" BackgroundColor="Transparent" HorizontalOptions="Start" >
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding SearchTrainCommand}" CommandParameter="{Binding Text, Source={x:Reference searchBar}}"/>
                 </Image.GestureRecognizers>
             </Image>
-            <Entry Keyboard="Numeric" ReturnType="Done" x:Name="searchBar" Style="{StaticResource CommonEntryHeaderStyle}" Text="{Binding CurrentTrainNumber}" ClearButtonVisibility="WhileEditing" 
+            <Entry Keyboard="Numeric" ReturnType="Done" x:Name="searchBar" Style="{StaticResource CommonLabelHeaderStyle}" Text="{Binding CurrentTrainNumber}" ClearButtonVisibility="WhileEditing" 
                    ReturnCommand="{Binding SearchTrainCommand}" ReturnCommandParameter="{Binding}" TextColor="{StaticResource Gray700}"
                     Placeholder="Inserisci il numero di un treno" PlaceholderColor="{StaticResource Gray700}" VerticalOptions="Center" />
         </StackLayout>
@@ -154,21 +154,30 @@
         <RefreshView Grid.Row="1" 
          Command="{Binding LoadDataCommand}" 
          IsRefreshing="{Binding IsRefreshing}" 
-         RefreshColor="{StaticResource BrandColor}"
+         RefreshColor="Transparent"
          Margin="0,0,0,0">
-            <CollectionView x:Name="collectionView" ItemsSource="{Binding RecentTrains}"
+        <CollectionView x:Name="collectionView" 
+                ItemsSource="{Binding RecentTrains}"
                 IsGrouped="True"
                 VerticalScrollBarVisibility="Never"
                 SelectionMode="None"
                 GroupHeaderTemplate="{StaticResource GroupHeaderDataTemplate}"
                 ItemTemplate="{StaticResource TrainDataTemplate}"
                 Margin="0">
-            </CollectionView>
+            <!--<CollectionView.GestureRecognizers>
+                <SwipeGestureRecognizer Direction="Down"  Command="{Binding LoadDataCommand}" />
+            </CollectionView.GestureRecognizers>-->
+        </CollectionView>
         </RefreshView>
 
-        <controls:CustomActivityIndicator Grid.RowSpan="2" 
-                              IsVisible="{Binding LoadDataCommand.IsRunning}"
-                              HorizontalOptions="Center"
-                              VerticalOptions="Center" />
+        <controls:CustomActivityIndicator Grid.RowSpan="2" HorizontalOptions="Center"
+                            VerticalOptions="Center" >
+            <controls:CustomActivityIndicator.IsVisible>
+                <MultiBinding Converter="{StaticResource Key=VariableMultiValueConverter}">
+                    <Binding Path="LoadDataCommand.IsRunning"/>
+                    <Binding Path="SearchTrainCommand.IsRunning"/>
+                </MultiBinding>
+            </controls:CustomActivityIndicator.IsVisible>
+        </controls:CustomActivityIndicator>
     </Grid>
 </pages:BaseContentPage>

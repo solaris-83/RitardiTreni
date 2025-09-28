@@ -12,15 +12,16 @@ public partial class TrainsSearchPage : BaseContentPage<TrainsSearchViewModel>
         _viewModel = vm;
     }
 
-    private void _viewModel_SearchTrainCompleted(object? sender, EventArgs e)
-    {
-        collectionView.ScrollTo(0, -1, ScrollToPosition.Start, true);
-    }
-
     protected override void OnAppearing()
     {
         base.OnAppearing();
         _viewModel.SearchTrainCompleted += _viewModel_SearchTrainCompleted;
+    }
+
+    private void _viewModel_SearchTrainCompleted(object? sender, int e)
+    {
+        if (e > 0)
+           collectionView.ScrollTo(0, -1, ScrollToPosition.Start, true);
     }
 
     protected override void OnDisappearing()

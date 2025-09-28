@@ -9,7 +9,7 @@
              x:TypeArguments="vm:RssFeedViewModel">
     <ContentPage.Resources>
         <Style x:Key="CommonLabelHeaderStyle" TargetType="Label">
-            <Setter Property="FontFamily" Value="OpenSans-Regular" />
+            <Setter Property="FontFamily" Value="OpenSansRegular" />
             <Setter Property="FontSize" Value="14" />
             <Setter Property="TextColor" Value="{StaticResource Gray500}" />
         </Style>
