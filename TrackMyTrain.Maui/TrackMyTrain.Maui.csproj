@@ -107,6 +107,9 @@
 	  <MauiXaml Update="Pages\Controls\CustomPopup.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Pages\Controls\CustomPopupPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Pages\RssFeedPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

@@ -1,5 +1,4 @@
-﻿
-using CommunityToolkit.Maui;
+﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -8,6 +7,7 @@ using TrackMyTrain.Data.Implementations;
 using TrackMyTrain.Data.Interfaces;
 using TrackMyTrain.Maui.LocalDb.Models;
 using TrackMyTrain.Maui.Models;
+using TrackMyTrain.Maui.Pages.Controls;
 using TrackMyTrain.Maui.Services;
 using TrackMyTrain.Maui.Utilities;
 
@@ -21,6 +21,7 @@ namespace TrackMyTrain.Maui.ViewModels
         private readonly ILogger<TrainsSearchViewModel> _logger;
         private const byte MAX_NUMBER_OF_FAVORITE_TRAINS = 15;
         private const byte MAX_NUMBER_OF_SEARCHED_TRAINS = 5;
+        private readonly INavigation navigation = Application.Current.Windows[0].Page.Navigation ?? throw new NotImplementedException($"Couldn't get Navigation for {Application.Current.Windows[0].Page}");
 
         private bool _canRefresh = true;
         public TrainsSearchViewModel(ILogger<TrainsSearchViewModel> logger, INotificationHandler notificationHandler, IHttpDataService httpDataService, IPopupService popupService, LocalDbService dbService) : base(notificationHandler)
@@ -49,14 +50,26 @@ namespace TrackMyTrain.Maui.ViewModels
         }
 
         [RelayCommand]
-        private void ShowLastTrackedPosition(RecentTrain recentTrain)
+        private async Task ShowLastTrackedPositionAsync(RecentTrain recentTrain)
         {
             var queryAttributes = new Dictionary<string, object>
             {
                 { "RecentTrain", recentTrain }
             };
             _canRefresh = false;
-            _popupService.ShowPopup<CustomPopupViewModel>(Shell.Current, new PopupOptions() { CanBeDismissedByTappingOutsideOfPopup = true }, queryAttributes);
+            CustomPopupViewModel customPopupViewModel = new CustomPopupViewModel();
+            customPopupViewModel.Information = new Tuple<string, string, string>(recentTrain.SubTitle, recentTrain.CompOraUltimoRilevamento, recentTrain.StazioneUltimoRilevamento == "--" ? "" : recentTrain.StazioneUltimoRilevamento);
+            //  await Shell.Current.GoToAsync("custompopuppage", queryAttributes);
+            // TODO togliere xaml da viewmodel
+            await navigation.PushModalAsync(new CustomPopupPage(customPopupViewModel));
+          //  _popupService.ShowPopup<CustomPopupViewModel>(Shell.Current, new PopupOptions() { CanBeDismissedByTappingOutsideOfPopup = true }, queryAttributes);
+            foreach (var trains in RecentTrains)
+            {
+                foreach (var train in trains)
+                {
+                    train.PropertyChanged += Train_PropertyChanged;
+                }
+            }
         }
 
         [RelayCommand]
@@ -114,7 +127,7 @@ namespace TrackMyTrain.Maui.ViewModels
                 var taskCompleted = await Task.WhenAll(tasks);
 
                 var itemsToLoadGrouped = taskCompleted
-                   // .Where(x => x != null)               // filter out nulls
+                    .Where(x => x != null)               // filter out nulls
                     .Cast<RecentTrain>()                 // cast safely since nulls are gone
                     .GroupBy(train => train.IsFavorite)  // group by IsFavorite
                     .Select(g => new RecentTrainGroup(g.Key, g)) // pass group to ctor
@@ -148,24 +161,24 @@ namespace TrackMyTrain.Maui.ViewModels
                 new DateTimeOffset(DateTime.Today).ToUnixTimeMilliseconds());
 
             var trainJourney = await _httpDataService.GetTrainJourneyAsync(autocompleteTrain);
-            if (trainJourney == null) return null;
+          //  if (trainJourney == null) return null;
 
             var mappedTrain = new RecentTrain(
                 train.ID,
-                trainJourney.CompNumeroTreno,
+                train.NumberWithCategory,
                 autocompleteTrain.TrainNumber,
                 autocompleteTrain.DepartureStationName,
                 train.ArrivalStationName,
-                trainJourney.CompOrarioPartenza,
-                trainJourney.CompOrarioArrivo,
-                trainJourney.Ritardo,
-                trainJourney.FormatDelay(),
-                trainJourney.HasWarning(),
+                train.DepartureTime,
+                train.ArrivalTime,
+                trainJourney?.Ritardo,
+                trainJourney == null? "" : trainJourney.FormatDelay(),
+                trainJourney == null? false : trainJourney.HasWarning(),
                 train.IsFavorite,
-                trainJourney.SubTitle,
-                trainJourney.compOraUltimoRilevamento,
-                trainJourney.StazioneUltimoRilevamento, 
-                trainJourney.NonPartito);
+                trainJourney?.SubTitle,
+                trainJourney?.compOraUltimoRilevamento,
+                trainJourney?.StazioneUltimoRilevamento, 
+                trainJourney == null? false : trainJourney.NonPartito);
 
             mappedTrain.PropertyChanged += Train_PropertyChanged;
             return mappedTrain;
@@ -284,7 +297,7 @@ namespace TrackMyTrain.Maui.ViewModels
                         ArrivalStationName = trainJourney.Destinazione,
                         ArrivalStationShortCode = trainJourney.IdDestinazione,
                         Number = autocompleteTrain.TrainNumber,
-                        NumberWithCategory = trainJourney.Categoria,
+                        NumberWithCategory = trainJourney.CompNumeroTreno,
                         DepartureTime = trainJourney.CompOrarioPartenza,
                         ArrivalTime = trainJourney.CompOrarioArrivo
                     };

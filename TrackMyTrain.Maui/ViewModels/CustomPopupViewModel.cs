@@ -5,24 +5,23 @@ using TrackMyTrain.Maui.Models;
 
 namespace TrackMyTrain.Maui.ViewModels
 {
-    public partial class CustomPopupViewModel : ObservableObject, IQueryAttributable
+    public partial class CustomPopupViewModel : ObservableObject//, IQueryAttributable
     {
         private readonly IPopupService _popupService;
 
         [ObservableProperty]
         private Tuple<string, string, string> _information;
 
-        public CustomPopupViewModel(IPopupService popupService)
+        public CustomPopupViewModel()
         {
-            _popupService = popupService;
         }
 
-        public void ApplyQueryAttributes(IDictionary<string, object> query)
-        {
-            if (query["RecentTrain"] is RecentTrain recentTrain)
-            {
-                Information = new Tuple<string, string, string>(recentTrain.SubTitle, recentTrain.CompOraUltimoRilevamento, recentTrain.StazioneUltimoRilevamento);
-            }
-        }
+        //public void ApplyQueryAttributes(IDictionary<string, object> query)
+        //{
+        //    if (query["RecentTrain"] is RecentTrain recentTrain)
+        //    {
+        //        Information = new Tuple<string, string, string>(recentTrain.SubTitle, recentTrain.CompOraUltimoRilevamento, recentTrain.StazioneUltimoRilevamento);
+        //    }
+        //}
     }
 }

@@ -67,11 +67,12 @@ namespace TrackMyTrain.Maui
             builder.Services.AddTransient<StationsSearchPage, StationsSearchViewModel>();
             builder.Services.AddTransient<TrainsSearchPage, TrainsSearchViewModel>();
             builder.Services.AddTransient<TrainDetailPage, TrainDetailViewModel>();
-            builder.Services.AddTransientPopup<CustomPopup, CustomPopupViewModel>();
+            builder.Services.AddTransient<CustomPopupPage, CustomPopupViewModel>();
             builder.Services.AddTransientPopup<TrainsSelectionPopup, TrainsSelectionViewModel>();
 
             // Here register all routes being outside the Shell
             Routing.RegisterRoute("traindetails", typeof(TrainDetailPage));
+            Routing.RegisterRoute("custompopuppage", typeof(CustomPopupPage));
 
             builder.Services.AddHttpClient("api", config => { config.BaseAddress = new Uri("http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/"); }).ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler
 

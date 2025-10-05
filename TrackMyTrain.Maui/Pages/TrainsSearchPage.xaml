@@ -60,7 +60,7 @@
                             FontSize="16"
                             LineBreakMode="WordWrap"
                             TextColor="{StaticResource Gray700}" />
-                        <Image Source="three_dots.png" HeightRequest="18" WidthRequest="18" IsVisible="{Binding ShowInfoTrain}" Grid.Row="0" Grid.Column="4" >
+                        <Image Source="three_dots.png" HeightRequest="18" WidthRequest="18" IsVisible="{Binding ShowInfoTrain}" Grid.Row="0" HorizontalOptions="End" Grid.Column="4" >
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup x:Name="CommonStates">
                                     <VisualState x:Name="Normal" />
@@ -102,8 +102,8 @@
                                 TextColor="{StaticResource Gray700}" />
                         </StackLayout>
 
-                        <Border StrokeThickness="0" Grid.RowSpan="3" HorizontalOptions="Center" BackgroundColor="Transparent" Padding="10,0,0,0" VerticalOptions="Fill" Grid.Column="2">
-                            <Image Source="emptystar.png" WidthRequest="18" HeightRequest="18" >
+                        <Border StrokeThickness="0" Grid.RowSpan="3" HorizontalOptions="Center" BackgroundColor="Transparent" Padding="10,0,0,20" VerticalOptions="End" Grid.Column="4">
+                            <Image Source="emptystar.png" WidthRequest="19" HeightRequest="19" >
                                 <Image.Triggers>
                                     <DataTrigger TargetType="Image"
                                     Binding="{Binding IsFavorite,Mode=TwoWay}" Value="True">
@@ -117,7 +117,7 @@
                         </Border>
 
 
-                        <VerticalStackLayout Grid.RowSpan="3" VerticalOptions="Center" Grid.Column="4" Padding="0,0,0,0" Spacing="20">
+                        <VerticalStackLayout Grid.RowSpan="3" VerticalOptions="Center" Grid.Column="2" Padding="0,0,0,0" Spacing="20">
                             <VerticalStackLayout.Triggers>
                                 <DataTrigger TargetType="VerticalStackLayout"
                                       Binding="{Binding HasWarning}" Value="True">
@@ -153,7 +153,7 @@
 
         <RefreshView Grid.Row="1" 
          Command="{Binding LoadDataCommand}" 
-         IsRefreshing="{Binding IsRefreshing}" 
+         IsRefreshing="{Binding IsRefreshing}"
          RefreshColor="Transparent"
          Margin="0,0,0,0">
         <CollectionView x:Name="collectionView" 

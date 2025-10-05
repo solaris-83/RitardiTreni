@@ -646,8 +646,8 @@
         <Setter Property="Shell.BackgroundColor" Value="{StaticResource BrandColor}" />
         <Setter Property="Shell.ForegroundColor" Value="{StaticResource BrandColor}" />
         <Setter Property="Shell.TitleColor" Value="{StaticResource Gray100}" />
-        <!--<Setter Property="Shell.DisabledColor" Value="{StaticResource Magenta}" />-->
-        <!--<Setter Property="Shell.UnselectedColor" Value="{StaticResource Magenta}" />-->
+        <!--<Setter Property="Shell.DisabledColor" Value="{StaticResource Magenta}" />
+        <Setter Property="Shell.UnselectedColor" Value="{StaticResource Magenta}" />-->
         <Setter Property="Shell.NavBarHasShadow" Value="False" />
         <Setter Property="Shell.TabBarBackgroundColor" Value="{StaticResource BorderLight}" />
         <Setter Property="Shell.TabBarForegroundColor" Value="{StaticResource BrandColor}" />
@@ -655,11 +655,11 @@
         <Setter Property="Shell.TabBarUnselectedColor" Value="{StaticResource Gray600}" />
     </Style>
 
-    <Style TargetType="NavigationPage">
+    <!--<Style TargetType="NavigationPage">
         <Setter Property="BarBackgroundColor" Value="{StaticResource BrandColor}" />
         <Setter Property="BarTextColor" Value="{StaticResource BrandColor}" />
         <Setter Property="BackgroundColor" Value="{StaticResource BrandColor}" />
-    </Style>
+    </Style>-->
 
 
 

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="TrackMyTrain.Maui.Pages.Controls.CustomPopupPage"
+              BackgroundColor="#aa000000">
+    <ContentPage.Resources>
+        <toolkit:IsStringNotNullOrEmptyConverter x:Key ="IsStringNotNullOrEmptyConverter"/>
+    </ContentPage.Resources>
+    <Grid>
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="TapGestureRecognizer_OnTapped" />
+        </Grid.GestureRecognizers>
+        <Border WidthRequest="300" HeightRequest="120" StrokeThickness="2" Stroke="#e0e0e0" StrokeShape="RoundRectangle 6" BackgroundColor="#fffdf8">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="TapGestureRecognizer_OnTapped" />
+            </Border.GestureRecognizers>
+            <ScrollView>
+                <VerticalStackLayout BackgroundColor="Transparent" VerticalOptions="Start" HorizontalOptions="Center" >
+                    <Label  Text="{Binding Information.Item1}" TextColor="{StaticResource Red}"
+                                HorizontalOptions="Fill" 
+                              LineBreakMode="WordWrap"
+                            FontSize="14" />
+                    <Label  Text="{Binding Information.Item2, StringFormat='{}Ultimo rilevamento {0}'}"
+                     LineBreakMode="WordWrap"
+                                            HorizontalOptions="Fill" 
+                            TextColor="{StaticResource Gray700}"
+                            IsVisible="{Binding Information.Item2, Converter={StaticResource Key=IsStringNotNullOrEmptyConverter}}"
+                            FontSize="14"
+                            />
+
+                    <Label  Text="{Binding Information.Item3, StringFormat='{}alle ore {0}'}"
+                LineBreakMode="WordWrap"
+                                  HorizontalOptions="Fill" 
+                        IsVisible="{Binding Information.Item3, Converter={StaticResource Key=IsStringNotNullOrEmptyConverter}}"
+                        TextColor="{StaticResource Gray700}"
+                        FontSize="14"/>
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
+    </Grid>
+</ContentPage>

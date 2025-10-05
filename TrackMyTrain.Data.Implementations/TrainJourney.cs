@@ -55,6 +55,8 @@ namespace TrackMyTrain.Data.Implementations
 
         public bool HasWarning()
         {
+            if (string.IsNullOrEmpty(TipoTreno)) 
+                return false;
             if (TipoTreno == "PG")
             {
                 // Se non è partito dopo 5 minuti dall'orario programmato
