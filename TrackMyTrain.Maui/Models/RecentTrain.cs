@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,12 +26,11 @@ namespace TrackMyTrain.Maui.Models
         public string CompOraUltimoRilevamento { get; private set; }
         public bool HasWarningAndFormattedDelayIsNotEmpty => HasWarning && !string.IsNullOrEmpty(FormattedDelay);
         public bool? NonPartito { get; private set; }
-        public bool ShowInfoTrain => CompOraUltimoRilevamento != null && CompOraUltimoRilevamento != "--"; // !(NonPartito && CompOraUltimoRilevamento == "--" && string.IsNullOrWhiteSpace(SubTitle) && StazioneUltimoRilevamento == "--");
-
+        public bool ShowInfoTrain => CompOraUltimoRilevamento != null && CompOraUltimoRilevamento != "--";
 
         [ObservableProperty]
         private bool _isFavorite;
-        
+
         public RecentTrain()
         {
         }
@@ -55,18 +54,6 @@ namespace TrackMyTrain.Maui.Models
             CompOraUltimoRilevamento = compOraUltimoRilevamento;
             StazioneUltimoRilevamento = stazioneUltimoRilevamento;
             NonPartito = nonPartito;
-        }
-    }
-
-    public class RecentTrainGroup : ObservableCollection<RecentTrain>
-    {
-        public bool IsFavorite { get; private set; }
-       // public ObservableCollection<RecentTrain> Values { get; private set; }
-       
-        public RecentTrainGroup(bool isFavorite, IEnumerable<RecentTrain> recentTrains) : base(recentTrains)
-        {
-            IsFavorite = isFavorite;
-           // Values = recentTrains;
         }
     }
 }
