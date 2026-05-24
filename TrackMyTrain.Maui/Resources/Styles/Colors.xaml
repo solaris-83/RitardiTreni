@@ -107,7 +107,8 @@
     <Color x:Key="Magenta">#D600AA</Color>
     <Color x:Key="Red">#DC143C</Color>
     <Color x:Key="OffBlack">#1F2937</Color>
-    <Color x:Key="BrandColor">#378415</Color> <!-- original #0078D4-->
+    <Color x:Key="BrandColor">#04406a</Color>
+    <!-- original #378415-->
     <Color x:Key="Gray950">#0F172A</Color>
     <Color x:Key="Green">Green</Color>
     

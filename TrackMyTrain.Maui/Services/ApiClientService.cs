@@ -15,6 +15,7 @@ namespace TrackMyTrain.Maui.Services
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<ApiClientService> _logger;
+        public string ClientName { get; set; }
         public ApiClientService(IHttpClientFactory httpClientFactory, ILogger<ApiClientService> logger)
         {
             _httpClientFactory = httpClientFactory;
@@ -70,7 +71,11 @@ namespace TrackMyTrain.Maui.Services
                 {
                     throw new Exception("No internet connection");
                 }
-                using (var client = _httpClientFactory.CreateClient("api"))
+
+                if (string.IsNullOrEmpty(ClientName))
+                    throw new Exception("You must specify client name");
+
+                using (var client = _httpClientFactory.CreateClient(ClientName))
                 {
                     if (authRequired)
                     {
@@ -127,7 +132,9 @@ namespace TrackMyTrain.Maui.Services
                 var checkInternet = GenericUtilities.CheckInternetConnection();
                 if (!checkInternet)
                     throw new Exception("No internet connection");
-                using (var client = _httpClientFactory.CreateClient("api"))
+                if (string.IsNullOrEmpty(ClientName))
+                    throw new Exception("You must specify client name");
+                using (var client = _httpClientFactory.CreateClient(ClientName))
                 {
                     if (authRequired)
                     {

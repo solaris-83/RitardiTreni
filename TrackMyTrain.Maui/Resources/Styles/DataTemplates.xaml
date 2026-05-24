@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                     xmlns:conv="clr-namespace:TrackMyTrain.Maui.Utilities"
+ xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+ xmlns:model="clr-namespace:TrackMyTrain.Maui.Models"
+ xmlns:vm="clr-namespace:TrackMyTrain.Maui.ViewModels"
+             x:Class="TrackMyTrain.Maui.Resources.Styles.DataTemplates">
+    <DataTemplate x:Key="GroupHeaderDataTemplate" x:DataType="model:RecentTrainGroup">
+        <Label Text="{Binding IsFavorite, Converter={StaticResource Key=HeaderCollectionViewConverter}}"
+   Style="{StaticResource CommonLabelHeaderStyle}"
+   Padding="5"
+   VerticalOptions="Center" />
+    </DataTemplate>
+    <DataTemplate x:Key="TrainDataTemplate" x:DataType="model:RecentTrain">
+        <Grid>
+            <Border
+     Stroke="#e0e0e0"
+     Padding="8"
+     StrokeThickness="1"
+     Background="#fffdf8"
+     StrokeShape="RoundRectangle 6">
+                <Border.Shadow>
+                    <Shadow Brush="Black"
+             Opacity="0.2"
+             Radius="10"
+             Offset="0,0" />
+                </Border.Shadow>
+                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto, *, Auto, 15, Auto, 5" RowSpacing="8">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer NumberOfTapsRequired="2" Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:TrainsSearchViewModel}},Path=DeleteCommand, x:DataType=vm:TrainsSearchViewModel}" CommandParameter="{Binding}" />
+                    </Grid.GestureRecognizers>
+                    <!-- Title -->
+                    <Label Grid.Row="0"
+            Text="{Binding NumberWithCategory}"
+            FontSize="16"
+            LineBreakMode="WordWrap"
+            TextColor="{StaticResource Gray700}" />
+                    <Image Source="three_dots.png" HeightRequest="18" WidthRequest="18" IsVisible="{Binding ShowInfoTrain}" Grid.Row="0" HorizontalOptions="End" Grid.Column="4" >
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <VisualState.Setters>
+                                        <!-- Darken by reducing opacity -->
+                                        <Setter Property="Opacity" Value="0.6"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:TrainsSearchViewModel}},Path=ShowLastTrackedPositionCommand, x:DataType=vm:TrainsSearchViewModel}" CommandParameter="{Binding .}" />
+                        </Image.GestureRecognizers>
+                    </Image>
+                    <StackLayout Orientation="Horizontal" Spacing="20" Grid.Row="1">
+                        <Label
+                Text="{Binding DepartureTime}"
+                FontSize="14"
+                FontAttributes="Bold"
+                TextColor="{StaticResource Gray700}" />
+
+                        <!-- Area -->
+                        <Label 
+                Text="{Binding DepartureStationName, Converter={StaticResource TextTitleCaseConverter}}"
+                FontSize="14"
+                TextColor="{StaticResource Gray700}" />
+                        <!-- Hours -->
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" Spacing="20" Grid.Row="2">
+                        <Label
+                Text="{Binding ArrivalTime}"
+                FontSize="14"
+                FontAttributes="Bold"
+                TextColor="{StaticResource Gray700}" />
+                        <Label 
+                Text="{Binding ArrivalStationName, Converter={StaticResource TextTitleCaseConverter}}"
+                FontSize="14"
+                TextColor="{StaticResource Gray700}" />
+                    </StackLayout>
+
+                    <Border StrokeThickness="0" Grid.RowSpan="3" HorizontalOptions="Center" BackgroundColor="Transparent" Padding="10,0,0,20" VerticalOptions="End" Grid.Column="4">
+                        <Image Source="emptystar.png" WidthRequest="19" HeightRequest="19" >
+                            <Image.Triggers>
+                                <DataTrigger TargetType="Image"
+                    Binding="{Binding IsFavorite,Mode=TwoWay}" Value="True">
+                                    <Setter Property="Source" Value="fullstar.png"/>
+                                </DataTrigger>
+                            </Image.Triggers>
+                        </Image>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:TrainsSearchViewModel}},Path=SetFavoriteCommand, x:DataType=vm:TrainsSearchViewModel}" CommandParameter="{Binding}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+
+
+                    <VerticalStackLayout Grid.RowSpan="3" VerticalOptions="Center" Grid.Column="2" Padding="0,0,0,0" Spacing="20">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout"
+                      Binding="{Binding HasWarning}" Value="True">
+                                <Setter Property="VerticalOptions" Value="Fill"/>
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+                        <Label  
+                Text="{Binding FormattedDelay}"
+                FontSize="16"
+                FontAttributes="Bold"
+                TextColor="{Binding Ritardo, Converter={StaticResource Key=CompareConverter}}"
+                LineBreakMode="WordWrap" />
+                        <Image Source="alert.png" WidthRequest="18" IsVisible="{Binding HasWarning}" HeightRequest="18" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

@@ -19,6 +19,7 @@
                 <VerticalStackLayout BackgroundColor="Transparent" VerticalOptions="Start" HorizontalOptions="Center" >
                     <Label  Text="{Binding Information.Item1}" TextColor="{StaticResource Red}"
                                 HorizontalOptions="Fill" 
+                             IsVisible="{Binding Information.Item1, Converter={StaticResource Key=IsStringNotNullOrEmptyConverter}}"
                               LineBreakMode="WordWrap"
                             FontSize="14" />
                     <Label  Text="{Binding Information.Item2, StringFormat='{}Ultimo rilevamento {0}'}"

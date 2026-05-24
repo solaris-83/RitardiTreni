@@ -14,7 +14,7 @@ namespace TrackMyTrain.Maui.Pages
             base.BackgroundColor = Color.FromArgb("#e5e5e5");
             this.Behaviors.Add(new StatusBarBehavior
             {
-                StatusBarColor = Colors.Green,
+                StatusBarColor = Color.FromArgb("#04406a"),
                 StatusBarStyle = StatusBarStyle.LightContent
             });
             base.BindingContext = viewModel;

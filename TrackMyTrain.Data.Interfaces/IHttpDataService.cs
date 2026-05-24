@@ -9,7 +9,7 @@ namespace TrackMyTrain.Data.Interfaces
 {
     public interface IHttpDataService
     {
-
+        Task<List<ExtendedFeedItem>> GetStrikesAsync();
         Task<List<TrainAutocomplete>> GetTrainsByNumberAsync(string trainNumber);
 
         Task<TrainJourney> GetTrainJourneyAsync(TrainAutocomplete stationTrain);

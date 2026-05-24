@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TrackMyTrain.Maui.Models;
+using TrackMyTrain.Maui.Pages.Controls;
 using TrackMyTrain.Maui.Services;
+using TrackMyTrain.Maui.ViewModels;
 
 namespace TrackMyTrain.Maui.Utilities
 {
@@ -35,4 +37,12 @@ namespace TrackMyTrain.Maui.Utilities
             return groups.SelectMany(g => g).FirstOrDefault(t => t.ID == ID);
         }
     }
+
+    //public static class UxDiversExtensions
+    //{
+    //    public static IServiceCollection AddTransientUxDiversPopup(this IServiceCollection services)
+    //    {
+    //        return services.AddTransientPopup<CustomPopup, CustomPopupViewModel>();
+    //    }
+    //}
 }

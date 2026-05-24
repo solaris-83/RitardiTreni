@@ -10,14 +10,16 @@ namespace TrackMyTrain.Maui.ViewModels
 {
     public partial class RssFeedViewModel : BaseViewModel
     {
+        private readonly IHttpDataService _httpDataService;
         private readonly IRssReaderService _feedReaderService;
         private readonly IPopupService _popupService;
         private string _selectedCategory = string.Empty;
         public List<string> Categories { get; private set; } = new List<string>();
 
-        public RssFeedViewModel(IRssReaderService feedReaderService, INotificationHandler notificationHandler, IPopupService popupService) : base(notificationHandler)
+        public RssFeedViewModel(IHttpDataService httpDataService, IRssReaderService feedReaderService, INotificationHandler notificationHandler, IPopupService popupService) : base(notificationHandler)
         {
             _feedReaderService = feedReaderService;
+            _httpDataService = httpDataService;
             _popupService = popupService;
             LoadSectors();
             LoadDataCommand = new AsyncRelayCommand(async () => await LoadFeedItems());
@@ -49,7 +51,9 @@ namespace TrackMyTrain.Maui.ViewModels
             {
                // IsRefreshing = true;
                 StrikesGrouped?.Clear();
-                var feeds = await _feedReaderService.RetrieveAsync("https://scioperi.mit.gov.it/mit2/public/scioperi/rss");
+                // TODO Quando verrà fixato il feed allora si potrà usare
+                 var feeds = await _feedReaderService.RetrieveAsync("https://scioperi.mit.gov.it/mit2/public/scioperi/rss");
+                //var feeds = await _httpDataService.GetStrikesAsync();
                 var feedsgrouped = feeds.Where(feed => feed.Settore == _selectedCategory).ToList().GroupBy(feed => $"{feed.DataInizio} - {feed.DataFine}")
                     .Select(g =>
                     new StrikeGroup(g.Key, g.Select(strike => new Strike { Title = strike.CategoriaInteressata, Area = strike.Rilevanza + $" (Regione: {strike.Regione})", Hours = strike.Modalita, Notes = strike.Sindacati })));

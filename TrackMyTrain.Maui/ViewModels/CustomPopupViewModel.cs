@@ -5,23 +5,42 @@ using TrackMyTrain.Maui.Models;
 
 namespace TrackMyTrain.Maui.ViewModels
 {
-    public partial class CustomPopupViewModel : ObservableObject//, IQueryAttributable
+    public partial class CustomPopupViewModel : ObservableObject, IQueryAttributable
     {
         private readonly IPopupService _popupService;
 
         [ObservableProperty]
-        private Tuple<string, string, string> _information;
+        private LastTrackedTrain _information;
 
-        public CustomPopupViewModel()
+        public CustomPopupViewModel(IPopupService popupService)
         {
+            _popupService = popupService;
         }
 
-        //public void ApplyQueryAttributes(IDictionary<string, object> query)
+        //public async Task OnPopupNavigatedAsync(IReadOnlyDictionary<string, object?> parameters)
         //{
-        //    if (query["RecentTrain"] is RecentTrain recentTrain)
+        //    if (parameters["RecentTrain"] is RecentTrain recentTrain)
         //    {
-        //        Information = new Tuple<string, string, string>(recentTrain.SubTitle, recentTrain.CompOraUltimoRilevamento, recentTrain.StazioneUltimoRilevamento);
+        //        Information = new LastTrackedTrain()
+        //        {
+        //            SubTitle = recentTrain.SubTitle,
+        //            CompOraUltimoRilevamento = recentTrain.CompOraUltimoRilevamento,
+        //            StazioneUltimoRilevamento = recentTrain.StazioneUltimoRilevamento
+        //        };
         //    }
         //}
+
+        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        {
+            if (query["RecentTrain"] is RecentTrain recentTrain)
+            {
+                Information = new LastTrackedTrain()
+                {
+                    SubTitle = recentTrain.SubTitle,
+                    CompOraUltimoRilevamento = recentTrain.CompOraUltimoRilevamento,
+                    StazioneUltimoRilevamento = recentTrain.StazioneUltimoRilevamento
+                };
+            }
+        }
     }
 }

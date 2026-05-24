@@ -25,8 +25,8 @@ namespace TrackMyTrain.Maui.Models
         public string StazioneUltimoRilevamento { get; private set; }
         public string CompOraUltimoRilevamento { get; private set; }
         public bool HasWarningAndFormattedDelayIsNotEmpty => HasWarning && !string.IsNullOrEmpty(FormattedDelay);
-        public bool NonPartito { get; private set; }
-        public bool ShowInfoTrain => !(NonPartito && CompOraUltimoRilevamento == "--" && string.IsNullOrWhiteSpace(SubTitle) && StazioneUltimoRilevamento == "--");
+        public bool? NonPartito { get; private set; }
+        public bool ShowInfoTrain => CompOraUltimoRilevamento != null && CompOraUltimoRilevamento != "--"; // !(NonPartito && CompOraUltimoRilevamento == "--" && string.IsNullOrWhiteSpace(SubTitle) && StazioneUltimoRilevamento == "--");
 
 
         [ObservableProperty]

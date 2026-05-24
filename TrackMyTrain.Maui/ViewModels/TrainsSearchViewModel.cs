@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Maui;
+﻿
+using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -24,7 +25,7 @@ namespace TrackMyTrain.Maui.ViewModels
         private readonly INavigation navigation = Application.Current.Windows[0].Page.Navigation ?? throw new NotImplementedException($"Couldn't get Navigation for {Application.Current.Windows[0].Page}");
 
         private bool _canRefresh = true;
-        public TrainsSearchViewModel(ILogger<TrainsSearchViewModel> logger, INotificationHandler notificationHandler, IHttpDataService httpDataService, IPopupService popupService, LocalDbService dbService) : base(notificationHandler)
+        public TrainsSearchViewModel( ILogger<TrainsSearchViewModel> logger, INotificationHandler notificationHandler, IHttpDataService httpDataService, IPopupService popupService, LocalDbService dbService) : base(notificationHandler)
         {
             _httpDataService = httpDataService;
             _popupService = popupService;
@@ -57,12 +58,15 @@ namespace TrackMyTrain.Maui.ViewModels
                 { "RecentTrain", recentTrain }
             };
             _canRefresh = false;
-            CustomPopupViewModel customPopupViewModel = new CustomPopupViewModel();
-            customPopupViewModel.Information = new Tuple<string, string, string>(recentTrain.SubTitle, recentTrain.CompOraUltimoRilevamento, recentTrain.StazioneUltimoRilevamento == "--" ? "" : recentTrain.StazioneUltimoRilevamento);
+        //    CustomPopupViewModel customPopupViewModel = new CustomPopupViewModel();
+         //   customPopupViewModel.Information = new Tuple<string, string, string>(recentTrain.SubTitle, recentTrain.CompOraUltimoRilevamento, recentTrain.StazioneUltimoRilevamento == "--" ? "" : recentTrain.StazioneUltimoRilevamento);
             //  await Shell.Current.GoToAsync("custompopuppage", queryAttributes);
             // TODO togliere xaml da viewmodel
-            await navigation.PushModalAsync(new CustomPopupPage(customPopupViewModel));
-          //  _popupService.ShowPopup<CustomPopupViewModel>(Shell.Current, new PopupOptions() { CanBeDismissedByTappingOutsideOfPopup = true }, queryAttributes);
+           // await navigation.PushModalAsync(new CustomPopupPage(customPopupViewModel));
+            await _popupService.ShowPopupAsync<CustomPopupViewModel>(Shell.Current, new PopupOptions() { CanBeDismissedByTappingOutsideOfPopup = true }, queryAttributes);
+
+            // Show a popup
+          //  await IPopupService.Current.PushAsync<CustomPopup>(queryAttributes);
             foreach (var trains in RecentTrains)
             {
                 foreach (var train in trains)
@@ -167,11 +171,11 @@ namespace TrackMyTrain.Maui.ViewModels
                 train.ID,
                 train.NumberWithCategory,
                 autocompleteTrain.TrainNumber,
-                autocompleteTrain.DepartureStationName,
-                train.ArrivalStationName,
+                trainJourney.Origine?? autocompleteTrain.DepartureStationName,
+                trainJourney.Destinazione?? train.ArrivalStationName,
                 train.DepartureTime,
                 train.ArrivalTime,
-                trainJourney?.Ritardo,
+                trainJourney?.Ritardo?? 0,
                 trainJourney == null? "" : trainJourney.FormatDelay(),
                 trainJourney == null? false : trainJourney.HasWarning(),
                 train.IsFavorite,
@@ -275,14 +279,13 @@ namespace TrackMyTrain.Maui.ViewModels
                         [nameof(TrainsSelectionViewModel.StationTrains)] = stationTrains
                     };
 
-                    var result = await _popupService.ShowPopupAsync<TrainsSelectionViewModel>(Shell.Current, options: new PopupOptions { CanBeDismissedByTappingOutsideOfPopup = true }, queryAttributes);
+                 //   var result = await _popupService.ShowPopupAsync<TrainsSelectionViewModel>(Shell.Current, options: new PopupOptions { CanBeDismissedByTappingOutsideOfPopup = true }, queryAttributes);
                      // TODO completare con logica corretta
                     //autocompleteTrain = result 
                 }
-                else
-                {
-                    autocompleteTrain = stationTrains.Single();
-                }
+                
+                autocompleteTrain = stationTrains.Last();
+                
                 // Se non ancora presente a DB lo aggiungo
                 var existingTrain = await _dbService.GetFirstFilteredAsync<Trains>(train => train.DepartureStationName == autocompleteTrain.DepartureStationName && train.Number == autocompleteTrain.TrainNumber);
                 if (existingTrain == null)

@@ -1,5 +1,5 @@
 ﻿
-using CommunityToolkit.Maui;
+
 using Microsoft.Extensions.Logging;
 using SimpleFeedReader;
 using TrackMyTrain.Data.Interfaces;
@@ -9,6 +9,8 @@ using TrackMyTrain.Maui.Pages.Controls;
 using TrackMyTrain.Maui.Pages.Views;
 using TrackMyTrain.Maui.Services;
 using TrackMyTrain.Maui.ViewModels;
+using CommunityToolkit.Maui;
+using TrackMyTrain.Maui.Utilities;
 
 namespace TrackMyTrain.Maui
 {
@@ -67,13 +69,28 @@ namespace TrackMyTrain.Maui
             builder.Services.AddTransient<StationsSearchPage, StationsSearchViewModel>();
             builder.Services.AddTransient<TrainsSearchPage, TrainsSearchViewModel>();
             builder.Services.AddTransient<TrainDetailPage, TrainDetailViewModel>();
-            builder.Services.AddTransient<CustomPopupPage, CustomPopupViewModel>();
-            builder.Services.AddTransientPopup<TrainsSelectionPopup, TrainsSelectionViewModel>();
-
+            builder.Services.AddTransientPopup<CustomPopup, CustomPopupViewModel>();
+            //builder.Services.AddTransientUxDiversPopup();
+            // builder.Services.AddTransientPopup<TrainsSelectionPopup, TrainsSelectionViewModel>();
+           
             // Here register all routes being outside the Shell
             Routing.RegisterRoute("traindetails", typeof(TrainDetailPage));
             Routing.RegisterRoute("custompopuppage", typeof(CustomPopupPage));
 
+            builder.Services.AddHttpClient("rssfeed", config => { config.BaseAddress = new Uri("https://scioperi.mit.gov.it/"); }).ConfigureHttpClient(_ =>
+            {
+                new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
+                    {
+                        if (cert?.Issuer != null && cert.Issuer.Contains("CN=Sectigo"))
+                        {
+                            return true;
+                        }
+                        return sslPolicyErrors == System.Net.Security.SslPolicyErrors.None;
+                    }
+                };
+            });
             builder.Services.AddHttpClient("api", config => { config.BaseAddress = new Uri("http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/"); }).ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler
 
             // Ensure these namespaces are included at the top of the file
